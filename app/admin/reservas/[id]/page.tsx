@@ -7,7 +7,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { ChevronLeft, Calendar, User, Mail, Phone, CreditCard, Building } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { CancelReservationButton } from "./cancel-button"
+import { ReservationActions } from "@/components/admin/reservation-actions"
 
 // Helper para formato de moneda
 const formatCurrency = (amount: number) => {
@@ -43,90 +43,92 @@ export default async function ReservationDetailPage({ params }: { params: Promis
     const nights = Math.ceil((reservation.endDate.getTime() - reservation.startDate.getTime()) / (1000 * 60 * 60 * 24))
 
     return (
-        <div className="flex flex-col space-y-6 p-8 w-full max-w-[1920px] mx-auto">
-            {/* Header de Navegación Mejorado */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6">
-                <div className="flex items-center gap-4">
-                    <Link href="/admin/reservas">
-                        <Button variant="outline" size="icon" className="h-9 w-9">
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                    </Link>
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-                            Reserva #{reservation.id}
-                            <Badge variant={reservation.status === 'CANCELLED' ? 'destructive' : 'default'} className="text-base px-3 py-1">
-                                {reservation.status}
-                            </Badge>
-                        </h1>
-                        <p className="text-muted-foreground mt-1">
-                            Creada el {reservation.createdAt.toLocaleDateString()} a las {reservation.createdAt.toLocaleTimeString()}
-                        </p>
-                    </div>
+        <div className="container max-w-5xl mx-auto p-6 space-y-6">
+            {/* Header */}
+            <div className="flex items-center gap-4">
+                <Link href="/admin/reservas">
+                    <Button variant="ghost" size="icon">
+                        <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                </Link>
+                <div className="flex-1">
+                    <h1 className="text-2xl font-semibold">Reserva #{reservation.id}</h1>
+                    <p className="text-sm text-muted-foreground">
+                        {reservation.createdAt.toLocaleDateString('es-ES', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })}
+                    </p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="w-[200px]">
-                        <CancelReservationButton id={reservation.id} currentStatus={reservation.status} />
-                    </div>
-                </div>
+                <Badge variant={
+                    reservation.status === 'CANCELLED' ? 'destructive' :
+                        reservation.status === 'CONFIRMED' ? 'default' :
+                            'outline'
+                }>
+                    {reservation.status === 'PENDING' ? 'Pendiente' :
+                        reservation.status === 'CONFIRMED' ? 'Confirmada' :
+                            reservation.status === 'CANCELLED' ? 'Cancelada' :
+                                reservation.status}
+                </Badge>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-                {/* Columna Izquierda (Info Principal): Cliente + Habitación */}
-                <div className="lg:col-span-8 space-y-8">
-
-                    {/* Tarjeta Cliente Expandida */}
-                    <Card className="shadow-sm border-l-4 border-l-primary">
+            <div className="grid gap-6 lg:grid-cols-3">
+                {/* Main Content - 2 columns */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Client Information */}
+                    <Card>
                         <CardHeader>
-                            <CardTitle className="text-xl flex items-center gap-2">
-                                <User className="h-5 w-5 text-primary" />
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                <User className="h-5 w-5" />
                                 Información del Cliente
                             </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <CardContent className="space-y-4">
+                            <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Nombre Completo</p>
-                                    <p className="font-bold text-xl mt-1">{reservation.user.name || "Sin nombre"}</p>
-                                    <Badge variant="secondary" className="mt-2">{reservation.user.status || "ACTIVE"}</Badge>
+                                    <p className="text-sm text-muted-foreground">Nombre</p>
+                                    <p className="font-medium">{reservation.user.name || "Sin nombre"}</p>
                                 </div>
-                                <div className="space-y-4">
-                                    <div className="flex items-start gap-3">
-                                        <div className="mt-1 w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
-                                            <Mail className="h-4 w-4" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-muted-foreground uppercase tracking-wide">Correo Electrónico</p>
-                                            <p className="font-medium text-base truncate">{reservation.user.email}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start gap-3">
-                                        <div className="mt-1 w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-600 shrink-0">
-                                            <Phone className="h-4 w-4" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-muted-foreground uppercase tracking-wide">Teléfono</p>
-                                            <p className="font-medium text-base">{reservation.user.phone}</p>
-                                        </div>
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Estado</p>
+                                    <Badge variant="secondary" className="mt-1">
+                                        {reservation.user.status || "ACTIVE"}
+                                    </Badge>
+                                </div>
+                            </div>
+                            <Separator />
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="flex items-center gap-3">
+                                    <Mail className="h-4 w-4 text-muted-foreground" />
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Email</p>
+                                        <p className="text-sm font-medium">{reservation.user.email}</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-center border-l pl-8">
-                                    <div className="text-center w-full">
-                                        <p className="text-sm text-muted-foreground">ID Cliente</p>
-                                        <p className="text-lg font-mono">{reservation.userId}</p>
+                                <div className="flex items-center gap-3">
+                                    <Phone className="h-4 w-4 text-muted-foreground" />
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Teléfono</p>
+                                        <p className="text-sm font-medium">{reservation.user.phone}</p>
                                     </div>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    {/* Tarjeta Habitación (Horizontal) */}
-                    <Card className="overflow-hidden shadow-sm">
-                        <div className="flex flex-col md:flex-row">
-                            <div className="md:w-1/3 aspect-video md:aspect-auto relative bg-muted">
-                                {reservation.room.images?.[0] ? (
-                                    <div className="w-full h-full relative">
+                    {/* Room Information */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                <Building className="h-5 w-5" />
+                                Habitación
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex gap-4">
+                                {reservation.room.images?.[0] && (
+                                    <div className="relative w-24 h-24 rounded-md overflow-hidden bg-muted shrink-0">
                                         <Image
                                             src={reservation.room.images[0]}
                                             alt={reservation.room.title}
@@ -134,89 +136,102 @@ export default async function ReservationDetailPage({ params }: { params: Promis
                                             className="object-cover"
                                         />
                                     </div>
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                                        Sin Imagen
-                                    </div>
                                 )}
-                            </div>
-                            <div className="flex-1 p-6">
-                                <div className="flex justify-between items-start mb-4">
+                                <div className="flex-1 space-y-2">
                                     <div>
-                                        <CardTitle className="text-xl mb-2">{reservation.room.title}</CardTitle>
-                                        <CardDescription className="flex items-center gap-1">
-                                            <Building className="h-3 w-3" /> Host: {reservation.room.holder}
-                                        </CardDescription>
+                                        <h3 className="font-semibold">{reservation.room.title}</h3>
+                                        <p className="text-sm text-muted-foreground">{reservation.room.holder}</p>
                                     </div>
-                                    <Button variant="ghost" size="sm" asChild>
+                                    <p className="text-sm text-muted-foreground line-clamp-2">
+                                        {reservation.room.description}
+                                    </p>
+                                    <Button variant="link" size="sm" asChild className="h-auto p-0">
                                         <Link href={`/habitaciones/${reservation.room.id}`} target="_blank">
-                                            Ver publicación <ChevronLeft className="h-4 w-4 rotate-180 ml-1" />
+                                            Ver habitación completa →
                                         </Link>
                                     </Button>
                                 </div>
-                                <p className="text-muted-foreground text-sm line-clamp-3 mb-6">
-                                    {reservation.room.description}
-                                </p>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <p className="text-xs text-muted-foreground uppercase">Precio Base</p>
-                                        <p className="font-medium">{formatCurrency(reservation.room.price)} / noche</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-muted-foreground uppercase">ID Habitación</p>
-                                        <p className="font-medium">#{reservation.roomId}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-
-                {/* Columna Derecha (Pagos y Estancia) */}
-                <div className="lg:col-span-4 space-y-8">
-                    <Card className="bg-slate-50 border-slate-200 shadow-md h-full">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Calendar className="h-5 w-5 text-primary" />
-                                Resumen de Estancia
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="grid grid-cols-2 gap-4 text-center bg-white p-4 rounded-xl border shadow-sm">
-                                <div>
-                                    <p className="text-xs text-muted-foreground uppercase font-bold mb-1">Entrada</p>
-                                    <p className="text-lg font-bold text-slate-800">{reservation.startDate.toLocaleDateString()}</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-muted-foreground uppercase font-bold mb-1">Salida</p>
-                                    <p className="text-lg font-bold text-slate-800">{reservation.endDate.toLocaleDateString()}</p>
-                                </div>
-                            </div>
-
-                            <div className="bg-white p-6 rounded-xl border shadow-sm space-y-4">
-                                <div className="flex justify-between items-center text-sm">
-                                    <span className="text-muted-foreground">{nights} noches x {formatCurrency(reservation.room.price)}</span>
-                                    <span>{formatCurrency(reservation.room.price * nights)}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-sm">
-                                    <span className="text-muted-foreground">Tarifa de limpieza</span>
-                                    <span>$0 COP</span>
-                                </div>
-                                <Separator />
-                                <div className="flex justify-between items-center">
-                                    <span className="font-bold text-lg">Total</span>
-                                    <span className="font-bold text-2xl text-primary">{formatCurrency(reservation.total)}</span>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-blue-50 p-3 rounded-lg text-blue-700">
-                                <CreditCard className="h-4 w-4" />
-                                Espera de Confirmación
                             </div>
                         </CardContent>
                     </Card>
                 </div>
 
+                {/* Sidebar - Ticket Style */}
+                <div className="space-y-6">
+                    {/* Dates Card */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                <Calendar className="h-5 w-5" />
+                                Estancia
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div>
+                                <p className="text-sm text-muted-foreground">Check-in</p>
+                                <p className="font-semibold">
+                                    {reservation.startDate.toLocaleDateString('es-ES', {
+                                        weekday: 'short',
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })}
+                                </p>
+                            </div>
+                            <Separator />
+                            <div>
+                                <p className="text-sm text-muted-foreground">Check-out</p>
+                                <p className="font-semibold">
+                                    {reservation.endDate.toLocaleDateString('es-ES', {
+                                        weekday: 'short',
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })}
+                                </p>
+                            </div>
+                            <Separator />
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-muted-foreground">Noches</span>
+                                <span className="font-semibold">{nights}</span>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Payment Summary */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                <CreditCard className="h-5 w-5" />
+                                Resumen
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">
+                                    {nights} {nights === 1 ? 'noche' : 'noches'}
+                                </span>
+                                <span>{formatCurrency(reservation.room.price * nights)}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Limpieza</span>
+                                <span>{formatCurrency(0)}</span>
+                            </div>
+                            <Separator />
+                            <div className="flex justify-between items-center">
+                                <span className="font-semibold">Total</span>
+                                <span className="text-xl font-bold">{formatCurrency(reservation.total)}</span>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Actions */}
+                    <Card>
+                        <CardContent className="pt-6">
+                            <ReservationActions id={reservation.id} currentStatus={reservation.status} />
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </div>
     )

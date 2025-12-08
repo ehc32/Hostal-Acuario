@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 
 interface RoomFormData {
     title: string
+    slug: string
     description: string
     price: number
     images: string[]

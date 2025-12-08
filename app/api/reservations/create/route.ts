@@ -8,7 +8,9 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { userInfo, reservationData } = body;
 
-        if (!reservationData || !reservationData.roomId || !reservationData.checkIn || !reservationData.checkOut) {
+        if (!reservationData || !reservationData.roomId ||
+            (!reservationData.checkIn && !reservationData.startDate) ||
+            (!reservationData.checkOut && !reservationData.endDate)) {
             return NextResponse.json({ error: 'Faltan datos de la reserva' }, { status: 400 });
         }
 
@@ -68,8 +70,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'La habitación seleccionada no existe.' }, { status: 404 });
         }
 
-        const checkInDate = new Date(reservationData.checkIn);
-        const checkOutDate = new Date(reservationData.checkOut);
+        // Soportar ambos nombres de campos (backward compatibility)
+        const checkInDate = new Date(reservationData.startDate || reservationData.checkIn);
+        const checkOutDate = new Date(reservationData.endDate || reservationData.checkOut);
 
         // Calcular noches
         const diffTime = Math.abs(checkOutDate.getTime() - checkInDate.getTime());
@@ -85,10 +88,10 @@ export async function POST(request: Request) {
             data: {
                 userId,
                 roomId,
-                checkIn: checkInDate,
-                checkOut: checkOutDate,
+                startDate: checkInDate,
+                endDate: checkOutDate,
                 total: totalAmount,
-                status: 'CONFIRMED'
+                status: 'PENDING'
             }
         });
 

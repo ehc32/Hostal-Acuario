@@ -41,6 +41,7 @@ export async function PUT(req: Request, props: Params) {
             where: { id },
             data: {
                 title: body.title,
+                slug: body.slug,
                 description: body.description,
                 price: Number(body.price),
                 images: body.images,

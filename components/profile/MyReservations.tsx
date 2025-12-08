@@ -14,8 +14,8 @@ import { es } from "date-fns/locale"
 interface Reservation {
     id: number
     status: string
-    checkIn: string
-    checkOut: string
+    startDate: string
+    endDate: string
     total: number
     room: {
         id: number
@@ -59,6 +59,8 @@ export function MyReservations() {
 
     const getStatusBadge = (status: string) => {
         switch (status) {
+            case "PENDING":
+                return <Badge variant="outline" className="text-yellow-600 border-yellow-200 bg-yellow-50">Pendiente</Badge>
             case "CONFIRMED":
                 return <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">Confirmada</Badge>
             case "COMPLETED":
@@ -66,7 +68,7 @@ export function MyReservations() {
             case "CANCELLED":
                 return <Badge variant="destructive" className="bg-red-100 text-red-700 hover:bg-red-100 border-red-200">Cancelada</Badge>
             default:
-                return <Badge variant="outline" className="text-yellow-600 border-yellow-200 bg-yellow-50">{status}</Badge>
+                return <Badge variant="outline" className="text-slate-600 border-slate-200 bg-slate-50">{status}</Badge>
         }
     }
 
@@ -137,7 +139,7 @@ export function MyReservations() {
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Llegada</span>
                                                     <span className="text-sm font-semibold text-slate-900">
-                                                        {format(new Date(reservation.checkIn), "d 'de' MMM, yyyy", { locale: es })}
+                                                        {format(new Date(reservation.startDate), "d 'de' MMM, yyyy", { locale: es })}
                                                     </span>
                                                 </div>
                                             </div>
@@ -146,7 +148,7 @@ export function MyReservations() {
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Salida</span>
                                                     <span className="text-sm font-semibold text-slate-900">
-                                                        {format(new Date(reservation.checkOut), "d 'de' MMM, yyyy", { locale: es })}
+                                                        {format(new Date(reservation.endDate), "d 'de' MMM, yyyy", { locale: es })}
                                                     </span>
                                                 </div>
                                             </div>

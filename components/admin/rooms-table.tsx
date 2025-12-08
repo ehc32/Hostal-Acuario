@@ -153,7 +153,7 @@ export function RoomsTable() {
         if (!deletingRoom) return
         try {
             const token = localStorage.getItem('token')
-            const res = await fetch(`/ api / admin / rooms / ${deletingRoom.id} `, {
+            const res = await fetch(`/api/admin/rooms/${deletingRoom.id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token} ` }
             })
@@ -233,7 +233,7 @@ export function RoomsTable() {
             header: "Acciones",
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => router.push(`/ admin / habitaciones / ${row.original.id} `)}>
+                    <Button variant="ghost" size="icon" onClick={() => router.push(`/admin/habitaciones/${row.original.id}`)}>
                         <IconPencil className="size-4 text-muted-foreground hover:text-foreground" />
                         <span className="sr-only">Editar</span>
                     </Button>

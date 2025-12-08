@@ -25,26 +25,25 @@ export default function FavoritosPage() {
   const [rooms, setRooms] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const fetchFavorites = async () => {
-    try {
-      const token = localStorage.getItem('token')
-      const res = await fetch('/api/favorites', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setRooms(data.data || [])
-      }
-      console.log(rooms)
-    } catch (error) {
-      console.error("Error cargando favoritos", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const res = await fetch('/api/favorites', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (res.ok) {
+          const data = await res.json()
+          console.log('Favorites data:', data)
+          setRooms(data.favorites || [])
+        }
+      } catch (error) {
+        console.error("Error cargando favoritos", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
     if (!authLoading) {
       if (!user) {
         router.push("/login")
@@ -52,7 +51,7 @@ export default function FavoritosPage() {
       }
       fetchFavorites()
     }
-  }, [user, authLoading, router, fetchFavorites])
+  }, [user, authLoading, router])
 
   if (authLoading || loading) {
     return <LoadingScreen title="Cargando Favoritos" description="Obteniendo tus habitaciones guardadas..." />
@@ -110,12 +109,20 @@ export default function FavoritosPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {rooms.map((room) => (
+            {rooms.map((favorite) => (
               <RoomCard
-                key={room.id}
-                {...room}
-                id={room.slug} // Url slug
-                dbId={room.id} // Numeric ID
+                key={favorite.room.id}
+                id={favorite.room.slug} // Url slug
+                dbId={favorite.room.id} // Numeric ID
+                title={favorite.room.title}
+                description={favorite.room.description}
+                price={favorite.room.price}
+                rating={favorite.room.rating}
+                reviews={favorite.room.reviews}
+                images={favorite.room.images}
+                amenities={favorite.room.amenities}
+                holder={favorite.room.holder}
+                initialIsFavorite={true}
               />
             ))}
           </div>

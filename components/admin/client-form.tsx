@@ -87,7 +87,7 @@ export function ClientForm({ user, onSave, onCancel }: ClientFormProps) {
                             <FormLabel>Rol</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Selecciona un rol" />
                                     </SelectTrigger>
                                 </FormControl>
@@ -110,7 +110,7 @@ export function ClientForm({ user, onSave, onCancel }: ClientFormProps) {
                             <FormLabel>Estado</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Estado" />
                                     </SelectTrigger>
                                 </FormControl>

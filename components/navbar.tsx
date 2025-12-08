@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Heart, Menu, User, LogOut, UserCircle } from "lucide-react"
+import { Heart, Menu, User, LogOut, UserCircle, User2Icon, Database, LayoutDashboard } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import {
     DropdownMenu,
@@ -110,7 +110,9 @@ export function Navbar() {
                                     {user.role === 'ADMIN' && (
                                         <DropdownMenuItem asChild>
                                             <Link href="/admin" className="cursor-pointer w-full flex items-center">
-                                                <span className="mr-2">🏨</span> Panel Admin
+                                                <span className="mr-2">
+                                                    <LayoutDashboard />
+                                                </span> Panel Admin
                                             </Link>
                                         </DropdownMenuItem>
                                     )}
@@ -123,7 +125,10 @@ export function Navbar() {
                         ) : (
                             <div className="flex items-center gap-2">
                                 <Button variant="ghost" asChild className="text-sm font-medium text-gray-700 hover:text-amber-600">
-                                    <Link href="/login">Iniciar Sesión</Link>
+                                    <Link href="/login" className="flex items-center gap-2">
+                                        <User2Icon className="h-4 w-4" />
+                                        Iniciar Sesión
+                                    </Link>
                                 </Button>
 
                             </div>

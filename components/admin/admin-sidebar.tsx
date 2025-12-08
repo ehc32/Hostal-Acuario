@@ -15,13 +15,14 @@ import {
     Users,
     BedDouble,
     CalendarDays,
-    LayoutDashboard
+    LayoutDashboard,
+    Home
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { HotelHeader } from "@/components/hotel-header"
 import {
     Sidebar,
     SidebarContent,
@@ -33,22 +34,15 @@ import {
 // Sample data
 const data = {
     user: {
-        name: "Administrador",
+        name: "Hotel Acuarios",
         email: "admin@hotel.com",
         avatar: "/avatars/shadcn.jpg",
     },
-    teams: [
-        {
-            name: "Hotel Acuarios",
-            logo: GalleryVerticalEnd,
-            plan: "Enterprise",
-        },
-    ],
     navMain: [
         {
-            title: "Plataforma",
+            title: "Vista General",
             url: "/admin",
-            icon: SquareTerminal,
+            icon: Home,
             isActive: true,
             items: [
                 {
@@ -88,7 +82,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
-                <TeamSwitcher teams={data.teams} />
+                <HotelHeader />
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />

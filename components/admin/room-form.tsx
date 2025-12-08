@@ -22,6 +22,7 @@ import Image from "next/image"
 
 const roomSchema = z.object({
     title: z.string().min(3, "El título es requerido"),
+    slug: z.string().min(3, "El slug es requerido").regex(/^[a-z0-9-]+$/, "Solo letras minúsculas, números y guiones"),
     description: z.string().min(10, "La descripción es muy corta"),
     price: z.coerce.number().min(1, "El precio debe ser mayor a 0"),
     holder: z.string().optional(),
@@ -47,6 +48,7 @@ export function RoomForm({ initialData, onSubmit, isLoading }: RoomFormProps) {
     // Preparar defaultValues con cuidado de tipos
     const defaultValues: Partial<RoomFormValues> = {
         title: initialData?.title || "",
+        slug: initialData?.slug || "",
         description: initialData?.description || "",
         price: initialData?.price ? Number(initialData.price) : 0,
         holder: initialData?.holder || "Admin",
@@ -72,6 +74,20 @@ export function RoomForm({ initialData, onSubmit, isLoading }: RoomFormProps) {
 
     const existingImages = form.watch("images") || []
     const totalImages = existingImages.length + newFiles.length
+
+    // Auto-generar slug desde el título
+    const titleValue = form.watch("title")
+    React.useEffect(() => {
+        if (titleValue && !initialData?.slug) {
+            const generatedSlug = titleValue
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "") // Eliminar acentos
+                .replace(/[^a-z0-9]+/g, "-") // Reemplazar caracteres especiales por guiones
+                .replace(/^-+|-+$/g, "") // Eliminar guiones al inicio y final
+            form.setValue("slug", generatedSlug, { shouldValidate: true })
+        }
+    }, [titleValue, form, initialData?.slug])
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files?.length) return
@@ -191,16 +207,35 @@ export function RoomForm({ initialData, onSubmit, isLoading }: RoomFormProps) {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
 
+                <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Título</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Ej: Suite Presidencial" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
                 <div className="grid gap-6 md:grid-cols-2">
                     <FormField
                         control={form.control}
-                        name="title"
+                        name="slug"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Título</FormLabel>
+                                <FormLabel>Slug (URL amigable)</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Ej: Suite Presidencial" {...field} />
+                                    <Input
+                                        placeholder="suite-presidencial"
+                                        {...field}
+                                        className="font-mono text-sm"
+                                    />
                                 </FormControl>
+                                <p className="text-xs text-muted-foreground">Se genera automáticamente, pero puedes editarlo</p>
                                 <FormMessage />
                             </FormItem>
                         )}

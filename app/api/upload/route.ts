@@ -1,41 +1,41 @@
-import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { NextResponse } from "next/server";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 export async function POST(request: Request) {
     const { searchParams } = new URL(request.url);
-    const filename = searchParams.get('filename');
+    const filename = searchParams.get("filename");
 
     if (!filename) {
-        return NextResponse.json({ error: 'Filename is required' }, { status: 400 });
+        return NextResponse.json({ error: "Filename is required" }, { status: 400 });
     }
 
     try {
         const buffer = Buffer.from(await request.arrayBuffer());
 
-        // Sanitizar nombre de archivo y hacerlo único
-        const safeName = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const uniqueName = `${Date.now()}-${safeName}`;
+        const result: any = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                { folder: "uploads" },
+                (err, res) => {
+                    if (err) reject(err);
+                    resolve(res);
+                }
+            );
 
-        // Directorio de destino: public/uploads
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-
-        // Crear directorio si no existe
-        await mkdir(uploadDir, { recursive: true });
-
-        const filePath = path.join(uploadDir, uniqueName);
-        await writeFile(filePath, buffer);
-
-        // Url accesible desde el navegador
-        const url = `/uploads/${uniqueName}`;
+            uploadStream.end(buffer);
+        });
 
         return NextResponse.json({
-            url,
-            pathname: url,
-            contentType: request.headers.get('content-type') || 'application/octet-stream'
+            url: result.secure_url,
+            public_id: result.public_id
         });
-    } catch (error) {
-        console.error("Upload error:", error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    } catch (err) {
+        console.error("Cloudinary upload error:", err);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

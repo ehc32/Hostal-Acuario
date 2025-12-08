@@ -46,7 +46,7 @@ export async function RoomsGrid() {
             <p>No hay habitaciones disponibles en este momento.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-15">
             {roomsToShow.map((room) => (
               <RoomCard
                 key={room.id}

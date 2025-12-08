@@ -43,10 +43,15 @@ export function DeleteDialog({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={(e: React.MouseEvent) => {
-                        e.preventDefault();
-                        onConfirm();
-                    }}>Confirmar</AlertDialogAction>
+                    <AlertDialogAction
+                        onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            onConfirm();
+                        }}
+                        variant="destructive"
+                    >
+                        Confirmar
+                    </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
