@@ -4,11 +4,23 @@ interface LoadingScreenProps {
     text?: string
     title?: string
     description?: string
+    fullscreen?: boolean
 }
 
-export function LoadingScreen({ text, title, description }: LoadingScreenProps) {
-    // Soporte retrocompatible: si pasan title/desc, usarlos. Si solo pasan text, usarlo como título.
+export function LoadingScreen({ text, title, description, fullscreen = false }: LoadingScreenProps) {
     const mainText = title || text || "Cargando..."
+
+    if (fullscreen) {
+        return (
+            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
+                <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                <div className="space-y-2 text-center">
+                    <p className="text-xl font-medium text-foreground">{mainText}</p>
+                    {description && <p className="text-sm text-muted-foreground">{description}</p>}
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 p-8 text-center">

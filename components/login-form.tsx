@@ -47,11 +47,14 @@ export function LoginForm({
 
                 console.log("Login exitoso. Rol:", data.user.role)
 
-                // Redirigir según el rol del usuario usando el Router de Next.js
+                console.log("Login exitoso. Rol:", data.user.role)
+
+                // Usamos window.location.href para asegurar que se recargue el contexto de autenticación
+                // y evitar problemas de estado estancado
                 if (data.user.role === "ADMIN") {
-                    router.push("/admin")
+                    window.location.href = "/admin"
                 } else {
-                    router.push("/profile")
+                    window.location.href = "/profile"
                 }
 
                 // Nota: No ponemos setIsLoading(false) aquí intencionalmente 
@@ -69,7 +72,7 @@ export function LoginForm({
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
-            {isLoading && <LoadingScreen title="Iniciando sesión" description="Verificando credenciales..." />}
+            {isLoading && <LoadingScreen fullscreen title="Iniciando sesión" description="Verificando credenciales..." />}
             <form onSubmit={handleSubmit}>
                 <FieldGroup>
                     <div className="flex flex-col items-center gap-2 text-center">
