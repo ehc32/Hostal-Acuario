@@ -4,12 +4,12 @@ import { HabitacionesFilters } from "@/app/habitaciones/filters"
 import { Navbar } from "@/components/navbar"
 import { Metadata } from "next"
 import Link from "next/link"
-import { Sparkles, SearchX } from "lucide-react"
-import {  
+import { SearchX } from "lucide-react"
+import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbList, 
+  BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"

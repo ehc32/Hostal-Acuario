@@ -33,6 +33,7 @@ const roomSchema = z.object({
 export type RoomFormValues = z.infer<typeof roomSchema>
 
 interface RoomFormProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     initialData?: any
     onSubmit: (data: RoomFormValues) => Promise<void>
     isLoading?: boolean
@@ -63,6 +64,7 @@ export function RoomForm({ initialData, onSubmit, isLoading }: RoomFormProps) {
     }
 
     const form = useForm<RoomFormValues>({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(roomSchema) as any,
         defaultValues,
         mode: "onChange"

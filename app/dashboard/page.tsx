@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 
 export default function DashboardPage() {
     const router = useRouter()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [user, setUser] = useState<any>(null)
 
     useEffect(() => {
@@ -18,6 +19,7 @@ export default function DashboardPage() {
         }
 
         const parsedUser = JSON.parse(userData)
+        // eslint-disable-next-line
         setUser(parsedUser)
 
         // Si es CLIENT, redirigir al perfil

@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -10,10 +11,18 @@ import { Separator } from "@/components/ui/separator"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
+interface Room {
+    id: number
+    title: string
+    price: number
+    images: string[]
+    holder?: string
+}
+
 interface ReservationModalProps {
     isOpen: boolean
     onClose: () => void
-    room: any // Tipar mejor si es posible (Room)
+    room: Room
     checkIn: Date | null
     checkOut: Date | null
     guests: number
@@ -72,8 +81,9 @@ export function ReservationModal({
             toast.success("¡Reserva creada con éxito!")
             onClose()
             // Aquí podrías redirigir a una página de "Mis Reservas" o "Éxito"
-        } catch (error: any) {
-            toast.error(error.message)
+        } catch (error: unknown) {
+            const msg = error instanceof Error ? error.message : "Error desconocido"
+            toast.error(msg)
         } finally {
             setIsLoading(false)
         }
@@ -97,7 +107,13 @@ export function ReservationModal({
                             {/* Miniatura Imagen (Placeholder si no hay) */}
                             <div className="w-20 h-20 rounded-lg bg-gray-200 overflow-hidden relative shrink-0">
                                 {room.images?.[0] && (
-                                    <img src={room.images[0]} alt={room.title} className="w-full h-full object-cover" />
+                                    <Image
+                                        src={room.images[0]}
+                                        alt={room.title}
+                                        fill
+                                        className="object-cover"
+                                        sizes="80px"
+                                    />
                                 )}
                             </div>
                             <div>

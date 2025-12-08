@@ -2,7 +2,6 @@ import { Navbar } from "@/components/navbar"
 import { Hero } from "@/components/hero"
 import { RoomsGrid } from "@/components/rooms-grid"
 import { Footer } from "@/components/footer"
-import { Testimonials } from "@/components/testimonials"
 import { FAQSection } from "@/components/FAQSection"
 import { InfoHotelAcuario } from "@/components/HotelInfo"
 

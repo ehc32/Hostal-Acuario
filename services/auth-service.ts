@@ -1,7 +1,33 @@
-import { prisma } from '@/lib/prisma';
-import { hashPassword, comparePassword, signToken } from '@/lib/auth-utils';
+import { prisma } from "@/lib/prisma";
+import {
+    hashPassword,
+    comparePassword,
+    signToken,
+    TokenPayload,
+} from "@/lib/auth-utils";
 
-export const registerUser = async (data: any) => {
+/* ----------------------------------------------------
+   TIPOS
+---------------------------------------------------- */
+
+interface RegisterData {
+    email: string;
+    password: string;
+    name?: string;
+    phone?: string;
+    role?: string;
+}
+
+interface LoginData {
+    email: string;
+    password: string;
+}
+
+/* ----------------------------------------------------
+   REGISTER USER
+---------------------------------------------------- */
+
+export const registerUser = async (data: RegisterData) => {
     const { email, password, name, phone, role } = data;
 
     const existingUser = await prisma.user.findUnique({
@@ -9,7 +35,7 @@ export const registerUser = async (data: any) => {
     });
 
     if (existingUser) {
-        throw new Error('User already exists');
+        throw new Error("User already exists");
     }
 
     const hashedPassword = await hashPassword(password);
@@ -18,18 +44,31 @@ export const registerUser = async (data: any) => {
         data: {
             email,
             password: hashedPassword,
-            name,
-            phone,
+            name: name ?? "",
+            phone: phone ?? "",
             role: role || "CLIENT",
         },
     });
 
-    const token = signToken({ id: user.id, email: user.email, role: user.role });
+    // VALIDACIÓN NECESARIA
+    if (!user.email) {
+        throw new Error("User has no valid email");
+    }
+
+    const token = signToken({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+    });
 
     return { user, token };
 };
 
-export const loginUser = async (data: any) => {
+/* ----------------------------------------------------
+   LOGIN USER
+---------------------------------------------------- */
+
+export const loginUser = async (data: LoginData) => {
     const { email, password } = data;
 
     const user = await prisma.user.findUnique({
@@ -37,27 +76,35 @@ export const loginUser = async (data: any) => {
     });
 
     if (!user) {
-        throw new Error('Credenciales invalidas');
+        throw new Error("Credenciales invalidas");
     }
 
-    // Verificar si la cuenta está eliminada
-    if (user.status === 'DELETED') {
-        throw new Error('Esta cuenta ha sido desactivada');
+    if (user.status === "DELETED") {
+        throw new Error("Esta cuenta ha sido desactivada");
     }
 
     const isPasswordValid = await comparePassword(password, user.password);
 
     if (!isPasswordValid) {
-        throw new Error('Credenciales invalidas');
+        throw new Error("Credenciales invalidas");
     }
 
-    // Actualizar última sesión
+    // VALIDACIÓN DE EMAIL NO NULO
+    if (!user.email) {
+        throw new Error("User has no valid email");
+    }
+
+    // Último login
     await prisma.user.update({
         where: { id: user.id },
-        data: { lastLogin: new Date() }
+        data: { lastLogin: new Date() },
     });
 
-    const token = signToken({ id: user.id, email: user.email, role: user.role });
+    const token = signToken({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+    });
 
     return {
         token,
@@ -72,6 +119,10 @@ export const loginUser = async (data: any) => {
         },
     };
 };
+
+/* ----------------------------------------------------
+   GET USER BY ID
+---------------------------------------------------- */
 
 export const getUserById = async (id: number) => {
     return prisma.user.findUnique({

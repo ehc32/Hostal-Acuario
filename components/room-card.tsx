@@ -162,8 +162,8 @@ export function RoomCard({
           >
             <Heart
               className={`h-6 w-6 stroke-[2px] transition-colors drop-shadow-sm ${isFavorite
-                  ? "fill-rose-500 stroke-rose-500"
-                  : "fill-black/50 stroke-white"
+                ? "fill-rose-500 stroke-rose-500"
+                : "fill-black/50 stroke-white"
                 }`}
             />
           </button>
@@ -195,8 +195,8 @@ export function RoomCard({
                 <span
                   key={index}
                   className={`h-1.5 w-1.5 rounded-full transition-all shadow-sm ${index === currentImage
-                      ? "bg-white w-2 opacity-100"
-                      : "bg-white/60 opacity-80"
+                    ? "bg-white w-2 opacity-100"
+                    : "bg-white/60 opacity-80"
                     }`}
                 />
               ))}

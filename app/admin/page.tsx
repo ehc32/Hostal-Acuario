@@ -8,7 +8,9 @@ export default async function AdminDashboard() {
     const reservationsCount = await prisma.reservation.count()
 
     // Cast para evitar errores si el campo 'total' no está generado en los tipos aún
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const reservations = await (prisma as any).reservation.findMany({ select: { total: true } })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const totalRevenue = reservations.reduce((acc: number, curr: any) => acc + (curr.total || 0), 0)
 
     return (

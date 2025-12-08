@@ -8,13 +8,22 @@ import { IconArrowLeft, IconLoader } from "@tabler/icons-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
+interface RoomFormData {
+    title: string
+    description: string
+    price: number
+    images: string[]
+    amenities: string[]
+    holder?: string
+}
+
 export default function EditarHabitacionPage() {
     const router = useRouter()
     const params = useParams()
     const id = params?.id as string
 
-    const [initialData, setInitialData] = React.useState(null)
-    const [loading, setLoading] = React.useState(true)
+    const [initialData, setInitialData] = React.useState<RoomFormData | null>(null)
+    const [loading, setLoading] = React.useState<boolean>(true)
 
     React.useEffect(() => {
         const fetchRoom = async () => {
@@ -22,48 +31,63 @@ export default function EditarHabitacionPage() {
             try {
                 const res = await fetch(`/api/admin/rooms/${id}`)
                 if (res.ok) {
-                    const data = await res.json()
+                    const data: RoomFormData = await res.json()
                     setInitialData(data)
                 } else {
                     toast.error("No se pudo cargar la habitación")
                 }
-            } catch (e) { console.error(e) }
-            finally { setLoading(false) }
+            } catch (error) {
+                console.error(error)
+            } finally {
+                setLoading(false)
+            }
         }
         fetchRoom()
     }, [id])
 
-    async function handleSubmit(data: any) {
+    async function handleSubmit(data: RoomFormData) {
         try {
-            const token = localStorage.getItem('token')
-            // Data ya viene procesada con amenities array y nuevas imagenes
+            const token = localStorage.getItem("token")
+
             const res = await fetch(`/api/admin/rooms/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify(data)
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: token ? `Bearer ${token}` : "",
+                },
+                body: JSON.stringify(data),
             })
 
             if (res.ok) {
                 toast.success("Habitación actualizada exitosamente")
-                router.push('/admin/habitaciones')
+                router.push("/admin/habitaciones")
             } else {
                 toast.error("Error al actualizar la habitación")
             }
-        } catch (e) {
+        } catch (_) {
             toast.error("Error de conexión")
         }
     }
 
-    if (loading) return <div className="flex h-[50vh] w-full items-center justify-center"><IconLoader className="animate-spin text-muted-foreground" /></div>
+    if (loading) {
+        return (
+            <div className="flex h-[50vh] w-full items-center justify-center">
+                <IconLoader className="animate-spin text-muted-foreground" />
+            </div>
+        )
+    }
 
     return (
         <div className="w-full space-y-6 py-4 px-4 md:px-6">
             <div className="flex items-center gap-2">
                 <Button variant="ghost" size="icon" asChild>
-                    <Link href="/admin/habitaciones"><IconArrowLeft /></Link>
+                    <Link href="/admin/habitaciones">
+                        <IconArrowLeft />
+                    </Link>
                 </Button>
                 <h1 className="text-2xl font-bold">Editar Habitación</h1>
             </div>
+
             <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
                 {initialData ? (
                     <RoomForm initialData={initialData} onSubmit={handleSubmit} />

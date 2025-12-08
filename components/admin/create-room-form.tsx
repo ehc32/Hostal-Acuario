@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { LoadingScreen } from "@/components/loading-screen"
 import { toast } from "sonner"
 import { X, Upload } from "lucide-react"
+import Image from "next/image"
 
 export function CreateRoomForm() {
     const router = useRouter()
@@ -40,9 +41,11 @@ export function CreateRoomForm() {
 
             toast.success("Habitación creada exitosamente")
             router.push("/admin/habitaciones")
+            router.push("/admin/habitaciones")
             router.refresh()
-        } catch (error: any) {
-            toast.error(error.message)
+        } catch (error: unknown) {
+            const msg = error instanceof Error ? error.message : "Error desconocido"
+            toast.error(msg)
         } finally {
             setLoading(false)
         }
@@ -115,7 +118,12 @@ export function CreateRoomForm() {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             {previews.map((src, i) => (
                                 <div key={i} className="relative aspect-video rounded-lg overflow-hidden border bg-muted">
-                                    <img src={src} alt="Preview" className="w-full h-full object-cover" />
+                                    <Image
+                                        src={src}
+                                        alt="Preview"
+                                        fill
+                                        className="object-cover"
+                                    />
                                     <button
                                         type="button"
                                         onClick={() => removeImage(i)}

@@ -11,6 +11,7 @@ export async function POST(req: Request) {
         }
 
         // 1. Crear review
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const review = await (prisma as any).review.create({
             data: {
                 rating: Number(rating),
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
         })
 
         // 2. Actualizar stats de la habitacion
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const aggregations = await (prisma as any).review.aggregate({
             where: { roomId: Number(roomId) },
             _avg: { rating: true },
@@ -50,13 +52,14 @@ export async function GET(req: Request) {
     if (!roomId) return NextResponse.json([])
 
     try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const reviews = await (prisma as any).review.findMany({
             where: { roomId: Number(roomId) },
             orderBy: { createdAt: 'desc' }
         })
 
         return NextResponse.json(reviews)
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: "Error fetching reviews" }, { status: 500 })
     }
 }

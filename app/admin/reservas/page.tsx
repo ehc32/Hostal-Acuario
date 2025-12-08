@@ -4,6 +4,7 @@ import { columns, ReservationColumn } from "./columns"
 
 export default async function ReservasPage() {
     // Cast a 'any' para evitar conflictos con tipos desactualizados
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const reservations = await (prisma as any).reservation.findMany({
         include: {
             room: { select: { title: true } },
@@ -12,6 +13,7 @@ export default async function ReservasPage() {
         orderBy: { createdAt: 'desc' }
     })
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const formattedReservations: ReservationColumn[] = reservations.map((res: any) => ({
         id: res.id,
         roomTitle: res.room.title,

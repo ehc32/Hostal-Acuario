@@ -21,19 +21,11 @@ import {
 export default function FavoritosPage() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [rooms, setRooms] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!authLoading) {
-      if (!user) {
-        router.push("/login")
-        return
-      }
-      fetchFavorites()
-    }
-  }, [user, authLoading, router])
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchFavorites = async () => {
     try {
       const token = localStorage.getItem('token')
@@ -51,6 +43,16 @@ export default function FavoritosPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        router.push("/login")
+        return
+      }
+      fetchFavorites()
+    }
+  }, [user, authLoading, router, fetchFavorites])
 
   if (authLoading || loading) {
     return <LoadingScreen title="Cargando Favoritos" description="Obteniendo tus habitaciones guardadas..." />

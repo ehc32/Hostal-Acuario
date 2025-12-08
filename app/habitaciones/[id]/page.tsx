@@ -2,7 +2,7 @@
 import { Navbar } from "@/components/navbar"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronLeft, Check, User } from "lucide-react"
+import { Check, User } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -35,7 +35,7 @@ export default async function RoomPage({ params }: RoomPageProps) {
   const { id } = await params
   const roomId = parseInt(id)
 
-  let room = await prisma.room.findFirst({
+  const room = await prisma.room.findFirst({
     where: {
       OR: [
         { id: isNaN(roomId) ? undefined : roomId },
@@ -49,13 +49,13 @@ export default async function RoomPage({ params }: RoomPageProps) {
   }
 
   // Fetch reviews (Casted to any due to Prisma generation issue)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const reviews = await (prisma as any).review.findMany({
     where: { roomId: room.id },
     orderBy: { createdAt: 'desc' }
   })
 
   // Fallbacks
-  const details = ["Baño privado", "Ropa de cama incluida", "Servicio de limpieza", "Ingreso 24 horas"]
   const images = room.images && room.images.length > 0 ? room.images : ["/placeholder.svg?height=600&width=800"]
 
   return (
@@ -172,6 +172,7 @@ export default async function RoomPage({ params }: RoomPageProps) {
 
             {/* SECCIÓN DE RESEÑAS */}
             <div id="reviews">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               <ReviewsSection roomId={room.id} initialReviews={reviews as any[]} />
             </div>
           </div>

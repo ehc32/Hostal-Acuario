@@ -14,6 +14,7 @@ export async function GET(req: Request) {
             return NextResponse.json({ favorites: [] })
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const favorites = await (prisma as any).favorite.findMany({
             where: { userId: auth.userId },
             include: {
@@ -53,6 +54,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Room ID required" }, { status: 400 })
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const existing = await (prisma as any).favorite.findUnique({
             where: {
                 userId_roomId: {
@@ -63,12 +65,14 @@ export async function POST(req: Request) {
         })
 
         if (existing) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (prisma as any).favorite.delete({
                 where: { id: existing.id }
             })
             console.log(`[API Favorites POST] Removed favorite ID: ${existing.id}`)
             return NextResponse.json({ action: 'removed' })
         } else {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const newFav = await (prisma as any).favorite.create({
                 data: {
                     userId: auth.userId,

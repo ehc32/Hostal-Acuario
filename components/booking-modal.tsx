@@ -74,7 +74,7 @@ export function BookingModal({ isOpen, onOpenChange, room, checkIn, checkOut, gu
         setIsLoading(true)
         try {
             const token = localStorage.getItem('token')
-            const headers: any = { 'Content-Type': 'application/json' }
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' }
             if (token) headers['Authorization'] = `Bearer ${token}`
 
             const payload = {

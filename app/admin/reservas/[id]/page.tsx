@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import Link from "next/link"
+import Image from "next/image"
 import { ChevronLeft, Calendar, User, Mail, Phone, CreditCard, Building } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CancelReservationButton } from "./cancel-button"
@@ -31,6 +32,7 @@ export default async function ReservationDetailPage({ params }: { params: Promis
             user: true,
             room: true
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any
 
     if (!reservation) {
@@ -124,11 +126,14 @@ export default async function ReservationDetailPage({ params }: { params: Promis
                         <div className="flex flex-col md:flex-row">
                             <div className="md:w-1/3 aspect-video md:aspect-auto relative bg-muted">
                                 {reservation.room.images?.[0] ? (
-                                    <img
-                                        src={reservation.room.images[0]}
-                                        alt={reservation.room.title}
-                                        className="w-full h-full object-cover"
-                                    />
+                                    <div className="w-full h-full relative">
+                                        <Image
+                                            src={reservation.room.images[0]}
+                                            alt={reservation.room.title}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                                         Sin Imagen

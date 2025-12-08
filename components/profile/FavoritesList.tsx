@@ -1,45 +1,76 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from 'react'
-import { Heart } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { RoomCard } from '@/components/room-card'
-import Link from 'next/link'
+import { useEffect, useState } from "react";
+import { Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { RoomCard } from "@/components/room-card";
+import Link from "next/link";
+
+/* ---------------------------------------------
+   TIPOS CORRECTOS BASADOS EN TU API
+----------------------------------------------*/
+
+export interface Room {
+    id: number;
+    slug: string;
+    title: string;
+    description: string;
+    price: number;
+    rating: number;
+    reviews: number;
+    images: string[];
+    amenities: string[];
+    holder: string;
+}
+
+export interface FavoriteItem {
+    id: number;
+    room: Room;
+}
+
+/* ---------------------------------------------
+   COMPONENTE
+----------------------------------------------*/
 
 export function FavoritesList() {
-    const [favorites, setFavorites] = useState<any[]>([])
-    const [loading, setLoading] = useState(true)
+    const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchFavorites = async () => {
             try {
-                const token = localStorage.getItem('token')
-                const res = await fetch('/api/favorites', {
+                const token = localStorage.getItem("token");
+                const res = await fetch("/api/favorites", {
                     headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                })
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
                 if (res.ok) {
-                    const data = await res.json()
-                    // La API devuelve { favorites: [ { room: { ... } }, ... ] }
-                    setFavorites(data.favorites || [])
+                    const data = await res.json();
+                    setFavorites(data.favorites || []);
                 }
             } catch (error) {
-                console.error("Error fetching favorites", error)
+                console.error("Error fetching favorites", error);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
-        }
+        };
 
-        fetchFavorites()
-    }, [])
+        fetchFavorites();
+    }, []);
 
     const handleToggle = (roomId: number, isFavorite: boolean) => {
         if (!isFavorite) {
-            setFavorites((prev) => prev.filter((item) => item.room.id !== roomId))
+            setFavorites((prev) =>
+                prev.filter((item) => item.room.id !== roomId)
+            );
         }
-    }
+    };
 
+    /* ---------------------------------------------
+       LOADING SKELETON
+    ----------------------------------------------*/
     if (loading) {
         return (
             <div className="space-y-6">
@@ -54,9 +85,12 @@ export function FavoritesList() {
                     ))}
                 </div>
             </div>
-        )
+        );
     }
 
+    /* ---------------------------------------------
+       LISTA VACÍA
+    ----------------------------------------------*/
     if (favorites.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-16 px-4 text-center border rounded-lg border-dashed border-slate-200 bg-slate-50/50">
@@ -67,17 +101,19 @@ export function FavoritesList() {
                     Aún no tienes favoritos
                 </h3>
                 <p className="text-slate-500 max-w-sm mb-8">
-                    Guarda los alojamientos que más te gusten haciendo clic en el corazón para encontrarlos fácilmente después.
+                    Guarda los alojamientos que más te gusten haciendo clic en el
+                    corazón para encontrarlos fácilmente después.
                 </p>
                 <Button asChild>
-                    <Link href="/">
-                        Explorar habitaciones
-                    </Link>
+                    <Link href="/">Explorar habitaciones</Link>
                 </Button>
             </div>
-        )
+        );
     }
 
+    /* ---------------------------------------------
+       LISTA DE FAVORITOS
+    ----------------------------------------------*/
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex items-center justify-between border-b pb-4">
@@ -91,7 +127,8 @@ export function FavoritesList() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {favorites.map((item) => {
-                    const room = item.room
+                    const room = item.room;
+
                     return (
                         <div key={item.id} className="h-full">
                             <RoomCard
@@ -106,12 +143,14 @@ export function FavoritesList() {
                                 amenities={room.amenities}
                                 holder={room.holder}
                                 initialIsFavorite={true}
-                                onAction={(isFavorite) => handleToggle(room.id, isFavorite)}
+                                onAction={(isFavorite) =>
+                                    handleToggle(room.id, isFavorite)
+                                }
                             />
                         </div>
-                    )
+                    );
                 })}
             </div>
         </div>
-    )
+    );
 }

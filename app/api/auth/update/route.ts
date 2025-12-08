@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth-utils';
+import { verifyToken, TokenPayload } from '@/lib/auth-utils';
 
 export async function PUT(request: NextRequest) {
     try {
@@ -10,16 +10,17 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
         }
 
-        const decoded = verifyToken(token);
+        const decoded = verifyToken(token) as TokenPayload | null;
+
+        if (!decoded) {
+            return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
+        }
+
         const { name, phone } = await request.json();
 
-        // Actualizar usuario en la base de datos
         const updatedUser = await prisma.user.update({
             where: { id: decoded.id },
-            data: {
-                name,
-                phone,
-            },
+            data: { name, phone },
         });
 
         return NextResponse.json({
@@ -34,8 +35,9 @@ export async function PUT(request: NextRequest) {
                 lastLogin: updatedUser.lastLogin,
             },
         });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Error desconocido";
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
 
@@ -47,16 +49,20 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
         }
 
-        const decoded = verifyToken(token);
+        const decoded = verifyToken(token) as TokenPayload | null;
 
-        // Borrado lógico: cambiar estado a DELETED en lugar de eliminar
+        if (!decoded) {
+            return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
+        }
+
         await prisma.user.update({
             where: { id: decoded.id },
-            data: { status: 'DELETED' }
+            data: { status: 'DELETED' },
         });
 
         return NextResponse.json({ message: 'Cuenta desactivada exitosamente' });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Error desconocido";
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

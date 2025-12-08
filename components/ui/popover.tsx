@@ -1,72 +1,114 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-const PopoverContext = React.createContext<{
+/* ----------------------------------------------------
+   CONTEXT TYPE
+---------------------------------------------------- */
+interface PopoverContextType {
     open: boolean;
     setOpen: (open: boolean) => void;
-}>({ open: false, setOpen: () => { } });
+}
 
-const Popover = ({ children, open: controlledOpen, onOpenChange }: any) => {
-    const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false)
-    const open = controlledOpen !== undefined ? controlledOpen : uncontrolledOpen
-    const setOpen = onOpenChange || setUncontrolledOpen
+const PopoverContext = React.createContext<PopoverContextType>({
+    open: false,
+    setOpen: () => { },
+});
+
+/* ----------------------------------------------------
+   POPOVER PROPS
+---------------------------------------------------- */
+interface PopoverProps {
+    children: React.ReactNode;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+}
+
+/* ----------------------------------------------------
+   POPOVER COMPONENT
+---------------------------------------------------- */
+const Popover: React.FC<PopoverProps> = ({
+    children,
+    open: controlledOpen,
+    onOpenChange,
+}) => {
+    const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false);
+
+    const open = controlledOpen ?? uncontrolledOpen;
+    const setOpen = onOpenChange ?? setUncontrolledOpen;
 
     return (
         <PopoverContext.Provider value={{ open, setOpen }}>
             <div className="relative inline-block">{children}</div>
         </PopoverContext.Provider>
-    )
-}
+    );
+};
 
-const PopoverTrigger = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ className, children, ...props }, ref) => {
-        const { open, setOpen } = React.useContext(PopoverContext)
+/* ----------------------------------------------------
+   TRIGGER
+---------------------------------------------------- */
+const PopoverTrigger = React.forwardRef<
+    HTMLDivElement,
+    React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => {
+    const { open, setOpen } = React.useContext(PopoverContext);
 
-        return (
-            <div
-                ref={ref}
-                className={cn("inline-flex cursor-pointer", className)}
-                onClick={() => setOpen(!open)}
-                {...props}
-            >
-                {children}
-            </div>
-        )
-    }
-)
-PopoverTrigger.displayName = "PopoverTrigger"
+    return (
+        <div
+            ref={ref}
+            className={cn("inline-flex cursor-pointer", className)}
+            onClick={() => setOpen(!open)}
+            {...props}
+        >
+            {children}
+        </div>
+    );
+});
 
+PopoverTrigger.displayName = "PopoverTrigger";
+
+/* ----------------------------------------------------
+   CONTENT PROPS
+---------------------------------------------------- */
 interface PopoverContentProps extends React.HTMLAttributes<HTMLDivElement> {
-    align?: "center" | "start" | "end"
-    sideOffset?: number
+    align?: "center" | "start" | "end";
+    sideOffset?: number;
 }
 
-const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
-    ({ className, align = "center", sideOffset = 4, ...props }, ref) => {
-        const { open } = React.useContext(PopoverContext)
+/* ----------------------------------------------------
+   CONTENT
+---------------------------------------------------- */
+const PopoverContent = React.forwardRef<
+    HTMLDivElement,
+    PopoverContentProps
+>(({ className, align = "center", sideOffset = 4, ...props }, ref) => {
+    const { open } = React.useContext(PopoverContext);
 
-        if (!open) return null
+    if (!open) return null;
 
-        return (
-            <div
-                ref={ref}
-                style={{
-                    position: 'absolute',
-                    top: `calc(100% + ${sideOffset}px)`,
-                    zIndex: 50
-                }}
-                className={cn(
-                    "w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95",
-                    align === "center" ? "left-1/2 -translate-x-1/2" : align === "end" ? "right-0" : "left-0",
-                    className
-                )}
-                {...props}
-            />
-        )
-    }
-)
-PopoverContent.displayName = "PopoverContent"
+    return (
+        <div
+            ref={ref}
+            style={{
+                position: "absolute",
+                top: `calc(100% + ${sideOffset}px)`,
+                zIndex: 50,
+            }}
+            className={cn(
+                "w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95",
+                align === "center"
+                    ? "left-1/2 -translate-x-1/2"
+                    : align === "end"
+                        ? "right-0"
+                        : "left-0",
+                className
+            )}
+            {...props}
+        />
+    );
+});
 
-export { Popover, PopoverTrigger, PopoverContent }
+PopoverContent.displayName = "PopoverContent";
+
+export { Popover, PopoverTrigger, PopoverContent };

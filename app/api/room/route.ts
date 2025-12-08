@@ -81,10 +81,13 @@ Has enviado ${files.length}.`,
     })
 
     return NextResponse.json(room, { status: 201 })
-  } catch (err: any) {
-    const status = err.status || 500
+  } catch (err: unknown) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const status = (err as any).status || 500
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const message = (err as any).message || "Error creando habitación"
     return NextResponse.json(
-      { error: err.message || "Error creando habitación" },
+      { error: message },
       { status }
     )
   }
