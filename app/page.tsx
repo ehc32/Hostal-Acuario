@@ -5,8 +5,6 @@ import { Footer } from "@/components/footer"
 import { Testimonials } from "@/components/testimonials"
 import { FAQSection } from "@/components/FAQSection"
 import { InfoHotelAcuario } from "@/components/HotelInfo"
-import { LocationMap } from "@/components/LocationHotelAcuario"
-import { ImageCarousel } from "@/components/image-carousel"
 
 export default function Home() {
   return (
