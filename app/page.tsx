@@ -6,6 +6,8 @@ import { FAQSection } from "@/components/FAQSection"
 import { InfoHotelAcuario } from "@/components/HotelInfo"
 import { ImageCarousel } from "@/components/image-carousel"
 
+export const dynamic = "force-dynamic"
+
 export default function Home() {
   return (
     <main className="min-h-screen">
