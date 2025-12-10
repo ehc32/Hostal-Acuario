@@ -181,6 +181,12 @@ export function RegisterForm({
                 </Link>
                 .
             </FieldDescription>
+
+            <div className="text-center text-sm mt-4">
+                <Link href="/" className="text-muted-foreground hover:text-foreground hover:underline transition-colors">
+                    Volver al inicio
+                </Link>
+            </div>
         </div>
     )
 }

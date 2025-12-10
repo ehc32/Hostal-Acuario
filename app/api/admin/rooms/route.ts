@@ -39,13 +39,15 @@ export async function POST(req: Request) {
                 title: body.title,
                 description: body.description,
                 price: Number(body.price),
+                priceHour: Number(body.priceHour) || 0,
                 holder: body.holder || "Anfitrión",
                 images: body.images || [],
                 amenities: body.amenities || [],
                 slug: slug,
                 rating: 5.0, // Default rating inicial
                 reviews: 0
-            }
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } as any
         })
 
         return NextResponse.json(room)

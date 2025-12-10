@@ -23,6 +23,9 @@ model User {
   updatedAt DateTime  @updatedAt
   lastLogin DateTime?
   reviews   Review[]
+  
+  resetToken       String?
+  resetTokenExpiry DateTime?
 }
 
 model Room {
@@ -31,6 +34,7 @@ model Room {
   title       String
   description String
   price       Int
+  priceHour   Int        @default(0)
   rating      Float      @default(0)
   reviews     Int        @default(0)
   holder      String
@@ -51,6 +55,11 @@ enum ReservationStatus {
   COMPLETED
 }
 
+enum ReservationType {
+  NIGHTLY
+  HOURLY
+}
+
 model Reservation {
   id Int @id @default(autoincrement())
 
@@ -64,6 +73,7 @@ model Reservation {
   endDate   DateTime
   total     Int
   status    ReservationStatus @default(PENDING)
+  type      ReservationType   @default(NIGHTLY)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -51,14 +51,22 @@ export default function ProfilePage() {
                             Gestiona tu información personal y preferencias
                         </p>
                     </div>
-                    <Button
-                        variant="ghost"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={handleLogout}
-                    >
-                        <LogOut className="w-4 h-4 mr-2" />
-                        Cerrar Sesión
-                    </Button>
+                    <div className="flex gap-4">
+                        <Button
+                            variant="outline"
+                            onClick={() => router.push('/habitaciones')}
+                        >
+                            Buscar Habitación
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={handleLogout}
+                        >
+                            <LogOut className="w-4 h-4 mr-2" />
+                            Cerrar Sesión
+                        </Button>
+                    </div>
                 </div>
 
                 <ProfileTabs />

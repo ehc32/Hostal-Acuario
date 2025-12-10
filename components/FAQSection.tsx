@@ -15,31 +15,22 @@ type FAQSectionProps = {
 }
 
 const defaultFAQs: FAQItem[] = [
-{
-  question: "¿Cuál es el horario de Check-in y Check-out en Hotel Acuario?",
-  answer:
-    "El Check-in está disponible desde las 3:00 p.m. y el Check-out debe realizarse antes de las 12:00 p.m. Si necesitas un horario especial, puedes solicitarlo con anticipación y estará sujeto a disponibilidad."
-},
-{
-  question: "¿Hotel Acuario ofrece cancelación gratuita?",
-  answer:
-    "Sí, contamos con opciones de reserva con cancelación gratuita dependiendo del tipo de habitación y fecha seleccionada. Puedes verificar las políticas al momento de reservar."
-},
-{
-  question: "¿Qué servicios incluye el Hotel Acuario?",
-  answer:
-    "Ofrecemos piscina al aire libre, parqueadero privado, restaurante, WiFi gratuito, recepción 24 horas, zonas comunes y servicio de desayuno. Algunos servicios pueden tener costo adicional."
-},
-{
-  question: "¿El hotel cuenta con restaurante o servicio de comidas?",
-  answer:
-    "Sí, disponemos de restaurante con menú variado y opciones típicas de la región. También ofrecemos snacks y bebidas durante el día."
-},
-{
-  question: "¿El Hotel Acuario tiene piscina?",
-  answer:
-    "Sí, contamos con piscina para adultos y zona de piscina para niños, perfecta para el clima cálido de Melgar."
-},
+  {
+    question: "¿Cuál es el horario de Check-in y Check-out en Hotel Acuario?",
+    answer:
+      "El Check-in está disponible desde las 3:00 p.m. y el Check-out debe realizarse antes de las 12:00 p.m. Si necesitas un horario especial, puedes solicitarlo con anticipación y estará sujeto a disponibilidad."
+  },
+  {
+    question: "¿Qué servicios incluye el Hotel Acuario?",
+    answer:
+      "WiFi gratuito, TV por cable, zonas comunes y servicio de bedidas y snacks."
+  },
+  {
+    question: "¿El hotel cuenta con restaurante o servicio de comidas?",
+    answer:
+      "Sí, disponemos de restaurante con menú variado y opciones típicas de la región. También ofrecemos snacks y bebidas durante el día."
+  },
+
 
 ]
 

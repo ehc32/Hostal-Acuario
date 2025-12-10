@@ -1,190 +1,61 @@
 "use client"
 
-import { Facebook, Instagram, Mail, Phone, MapPin } from "lucide-react"
-import { motion } from "framer-motion"
+import { Mail, Phone, MapPin } from "lucide-react"
 
-type FooterLink = {
-  label: string
-  href: string
-}
-
-type FooterSection = {
-  title: string
-  links: FooterLink[]
-}
-
-type FooterProps = {
-  hotelName?: string
-  tagline?: string
-  sections?: FooterSection[]
-  socialLinks?: {
-    facebook?: string
-    instagram?: string
-    email?: string
-    phone?: string
-    location?: string
-  }
-  copyrightText?: string
-}
-
-const defaultSections: FooterSection[] = [
-  {
-    title: "El Hotel",
-    links: [
-      { label: "Nosotros", href: "#nosotros" },
-      { label: "Habitaciones", href: "#habitaciones" },
-      { label: "Servicios", href: "#servicios" },
-      { label: "Galería", href: "#galeria" },
-    ],
-  },
-  {
-    title: "Servicios",
-    links: [
-      { label: "Piscina", href: "#piscina" },
-      { label: "Restaurante", href: "#restaurante" },
-      { label: "Parqueadero", href: "#parqueadero" },
-      { label: "WiFi", href: "#wifi" },
-    ],
-  },
-  {
-    title: "Atención al huésped",
-    links: [
-      { label: "Preguntas frecuentes", href: "#faq" },
-      { label: "Reservas", href: "#reservas" },
-      { label: "Contacto", href: "#contacto" },
-      { label: "Soporte", href: "#soporte" },
-    ],
-  },
-  {
-    title: "Información legal",
-    links: [
-      { label: "Política de privacidad", href: "#privacidad" },
-      { label: "Términos y condiciones", href: "#terminos" },
-      { label: "Tratamiento de datos", href: "#datos" },
-      { label: "Aviso legal", href: "#aviso" },
-    ],
-  },
-]
-
-export const Footer = ({
-  hotelName = "Hostal Acuario",
-  tagline = "Comodidad, descanso y experiencias únicas en Melgar, Tolima.",
-  sections = defaultSections,
-  socialLinks = {
-    facebook: "https://www.facebook.com/",
-    instagram: "https://www.instagram.com/",
-    email: "elellanos@hotmail.com",
-    phone: "+57 318 354 6487",
-    location: "Calle 13 #16-53 — Mártires Colombia",
-  },
-  copyrightText,
-}: FooterProps) => {
-  const currentYear = new Date().getFullYear()
-  const copyright =
-    copyrightText || `© ${currentYear} ${hotelName}. Todos los derechos reservados.`
-
+export const Footer = () => {
   return (
-    <footer className="w-full bg-[#f8f8f8] border-t border-[#e5e5e5]">
-      <div className="max-w-[1200px] mx-auto px-8 py-16">
+    <footer className="w-full bg-[#f8f8f8] border-t border-[#e5e5e5] py-8">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row gap-6 items-center md:items-start justify-between">
 
-        {/* CONTENIDO PRINCIPAL */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
-
-          {/* HOTEL INFO */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="col-span-2"
-          >
-            <h3 className="text-2xl font-semibold text-[#202020] mb-2">
-              {hotelName}
-            </h3>
-
-            <p className="text-sm text-[#666] max-w-xs">{tagline}</p>
-
-            {/* Dirección */}
-            <div className="mt-4 text-sm text-[#555]">
-              <p className="font-semibold text-[#202020] mb-1">Dirección:</p>
-              <p>{socialLinks.location}</p>
+          {/* Información del Hotel */}
+          <div className="flex-1 space-y-3 text-center md:text-left">
+            <div>
+              <h3 className="text-xl font-bold text-[#202020]">Hostal Acuario</h3>
+              <p className="text-[#666] text-sm mt-1 max-w-md mx-auto md:mx-0">
+                Comodidad, descanso y experiencias únicas en Melgar, Tolima.
+              </p>
             </div>
 
-            {/* Contacto */}
-            <div className="mt-4 flex flex-col gap-2 text-sm text-[#555]">
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-[#333]" />
-                <span>{socialLinks.phone}</span>
+            <div className="space-y-1.5 text-sm text-[#555] pt-2">
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-2">
+                <MapPin className="w-4 h-4 text-amber-600 shrink-0" />
+                <p>Calle 13 #16-53 — Mártires Colombia</p>
               </div>
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-[#333]" />
-                <span>{socialLinks.email}</span>
+
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-2">
+                <Phone className="w-4 h-4 text-amber-600 shrink-0" />
+                <p>+57 318 354 6487</p>
+              </div>
+
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-2">
+                <Mail className="w-4 h-4 text-amber-600 shrink-0" />
+                <p>elellanos@hotmail.com</p>
               </div>
             </div>
+          </div>
 
-            {/* Redes */}
-            <div className="flex items-center gap-3 mt-6">
-              {socialLinks.facebook && (
-                <a
-                  href={socialLinks.facebook}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-[#ccc] text-[#666] hover:text-[#000] hover:border-[#000] transition"
-                >
-                  <Facebook className="w-4 h-4" />
-                </a>
-              )}
+          {/* Mapa */}
+          <div className="w-full md:w-[320px] h-[160px] rounded-xl overflow-hidden shadow-sm border border-gray-200">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3978.3371343753736!2d-74.6436400846875!3d4.204595696941198!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f28f0b71114b3%3A0x6f11270c5722a465!2sCl.+13%20%2316-53%2C%20Melgar%2C%20Tolima!5e0!3m2!1ses!2sco!4v1709668478423!5m2!1ses!2sco"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Ubicación Hostal Acuario"
+            ></iframe>
+          </div>
 
-              {socialLinks.instagram && (
-                <a
-                  href={socialLinks.instagram}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-[#ccc] text-[#666] hover:text-[#000] hover:border-[#000] transition"
-                >
-                  <Instagram className="w-4 h-4" />
-                </a>
-              )}
-            </div>
-          </motion.div>
-
-          {/* SECCIONES */}
-          {sections.map((section, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="col-span-1"
-            >
-              <h4 className="text-sm font-semibold text-[#202020] mb-4 uppercase tracking-wide">
-                {section.title}
-              </h4>
-              <ul className="space-y-3">
-                {section.links.map((link, idx) => (
-                  <li key={idx}>
-                    <a
-                      href={link.href}
-                      className="text-sm text-[#666] hover:text-[#111] transition"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
         </div>
 
-        {/* COPYRIGHT */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="pt-6 border-t border-[#e5e5e5] text-center md:text-left"
-        >
-          <p className="text-sm text-[#666]">{copyright}</p>
-        </motion.div>
-
+        <div className="mt-6 pt-4 border-t border-gray-200 text-center">
+          <p className="text-xs text-[#888]">
+            © {new Date().getFullYear()} Hostal Acuario. Todos los derechos reservados.
+          </p>
+        </div>
       </div>
     </footer>
   )

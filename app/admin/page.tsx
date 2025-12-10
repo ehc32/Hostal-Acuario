@@ -2,6 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { prisma } from "@/lib/prisma"
 import { BedDouble, CalendarDays, Users, DollarSign } from "lucide-react"
 
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+
 export default async function AdminDashboard() {
     const roomsCount = await prisma.room.count()
     const usersCount = await prisma.user.count()
@@ -15,7 +18,14 @@ export default async function AdminDashboard() {
 
     return (
         <div className="space-y-8">
-            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+            <div className="flex items-center justify-between">
+                <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+                <div className="flex gap-2">
+                    <Link href="/admin/habitaciones">
+                        <Button>Revisar Habitaciones</Button>
+                    </Link>
+                </div>
+            </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>

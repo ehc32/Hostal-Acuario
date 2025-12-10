@@ -11,6 +11,7 @@ interface RoomCardProps {
   title: string
   description?: string
   price: number
+  priceHour?: number // Nuevo campo opcional
   rating: number
   reviews: number
   images: string[]
@@ -27,6 +28,7 @@ export function RoomCard({
   title,
   description,
   price,
+  priceHour,
   rating,
   reviews,
   images,
@@ -37,12 +39,14 @@ export function RoomCard({
   initialIsFavorite = false,
   onAction
 }: RoomCardProps) {
+  // ... (mismo estado)
   const [currentImage, setCurrentImage] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite)
 
   const validImages = images && images.length > 0 ? images : ["/placeholder.jpg"]
 
+  // ... (mismos handlers: nextImage, prevImage, toggleFavorite)
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -120,7 +124,7 @@ export function RoomCard({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex flex-col h-full gap-2">
-        {/* Image Container */}
+        {/* Image Container (mismo código) */}
         <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-200">
 
           {/* Guest Favorite Badge */}
@@ -223,10 +227,21 @@ export function RoomCard({
               <p className="line-clamp-1">{description}</p>
             ) : null}
 
-            <p className="mt-1.5 text-slate-900">
-              <span className="font-semibold">${price.toLocaleString('es-CO')} COP</span>
-              <span className="font-light"> noche</span>
-            </p>
+            <div className="mt-1.5 flex flex-wrap gap-x-3 items-baseline">
+              {/* Precio Hospedaje */}
+              <p className="text-slate-900">
+                <span className="font-semibold">${price.toLocaleString('es-CO')}</span>
+                <span className="font-light"> noche</span>
+              </p>
+
+              {/* Precio Por Rato (si existe) */}
+              {priceHour && priceHour > 0 && (
+                <p className="text-slate-600">
+                  <span className="font-medium">${priceHour.toLocaleString('es-CO')}</span>
+                  <span className="font-light text-sm"> / 3h</span>
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>

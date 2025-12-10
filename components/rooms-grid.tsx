@@ -55,6 +55,8 @@ export async function RoomsGrid() {
                 title={room.title}
                 description={room.description}
                 price={room.price}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                priceHour={(room as any).priceHour}
                 rating={room.rating}
                 reviews={room.reviews}
                 images={room.images}
