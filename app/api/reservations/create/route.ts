@@ -74,15 +74,41 @@ export async function POST(request: Request) {
         const checkInDate = new Date(reservationData.startDate || reservationData.checkIn);
         const checkOutDate = new Date(reservationData.endDate || reservationData.checkOut);
 
-        // Calcular noches
-        const diffTime = Math.abs(checkOutDate.getTime() - checkInDate.getTime());
-        const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const bookingType = reservationData.type || 'NIGHTLY'; // Recibimos el tipo
 
-        if (nights <= 0) {
-            return NextResponse.json({ error: 'Las fechas de reserva no son válidas.' }, { status: 400 });
+        // Validaciones de fechas
+        const diffTime = checkOutDate.getTime() - checkInDate.getTime();
+
+        // Si es NIGHTLY, debe haber al menos 1 día de diferencia
+        if (bookingType === 'NIGHTLY') {
+            const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (nights <= 0) {
+                return NextResponse.json({ error: 'Para hospedaje por noche, la salida debe ser después de la llegada.' }, { status: 400 });
+            }
+        }
+        // Si es HOURLY, la fecha puede ser la misma (pero no anterior)
+        else if (bookingType === 'HOURLY') {
+            if (diffTime < 0) {
+                return NextResponse.json({ error: 'La fecha no es válida.' }, { status: 400 });
+            }
         }
 
-        const totalAmount = nights * room.price;
+        let totalAmount = 0;
+
+        if (bookingType === 'HOURLY') {
+            // Precio fijo por sesión (3 Horas)
+            // Usamos un casting a 'any' temporal si room.priceHour no es reconocido por tipos viejos
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const hourlyPrice = Number((room as any).priceHour) || 0;
+            if (hourlyPrice <= 0) {
+                return NextResponse.json({ error: 'Esta habitación no admite reservas por horas.' }, { status: 400 });
+            }
+            totalAmount = hourlyPrice;
+        } else {
+            // Precio por Noche
+            const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            totalAmount = nights * room.price;
+        }
 
         const reservation = await prisma.reservation.create({
             data: {
@@ -91,7 +117,8 @@ export async function POST(request: Request) {
                 startDate: checkInDate,
                 endDate: checkOutDate,
                 total: totalAmount,
-                status: 'PENDING'
+                status: 'PENDING',
+                type: bookingType // Guardamos el tipo de reserva (NIGHTLY o HOURLY)
             }
         });
 
