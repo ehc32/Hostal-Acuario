@@ -17,6 +17,8 @@ export default async function CheckoutPage({ params, searchParams }: CheckoutPag
     const checkOut = sp.checkOut as string
     const guests = Number(sp.guests) || 1
 
+    const bookingType = (sp.type as "NIGHTLY" | "HOURLY") || "NIGHTLY"
+
     const roomId = parseInt(id)
 
     if (isNaN(roomId)) {
@@ -42,6 +44,7 @@ export default async function CheckoutPage({ params, searchParams }: CheckoutPag
             checkIn={checkIn}
             checkOut={checkOut}
             guests={guests}
+            bookingType={bookingType}
         />
     )
 }
