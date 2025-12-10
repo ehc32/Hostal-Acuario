@@ -199,26 +199,25 @@ export function CheckoutClient({
                                 <div>
                                     <p className="font-semibold">Fechas</p>
                                     <p className="text-muted-foreground">
-                                        <p className="text-muted-foreground">
-                                            {bookingType === "HOURLY" ? (
-                                                // Si es por hora, solo mostramos la fecha y indicamos "3 Horas"
-                                                start && (
-                                                    <>
-                                                        {format(start, "d 'de' MMM", { locale: es })}
-                                                        <span className="ml-2 inline-block px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
-                                                            Por Rato (3h)
-                                                        </span>
-                                                    </>
-                                                )
-                                            ) : (
-                                                // Si es por noche, mostramos Rango
+                                        {bookingType === "HOURLY" ? (
+                                            // Si es por hora, solo mostramos la fecha y indicamos "3 Horas"
+                                            start && (
                                                 <>
-                                                    {start && format(start, "d 'de' MMM", { locale: es })}{" "}
-                                                    -{" "}
-                                                    {end && format(end, "d 'de' MMM", { locale: es })}
+                                                    {format(start, "d 'de' MMM", { locale: es })}
+                                                    <span className="ml-2 inline-block px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
+                                                        Por Rato (3h)
+                                                    </span>
                                                 </>
-                                            )}
-                                        </p>
+                                            )
+                                        ) : (
+                                            // Si es por noche, mostramos Rango
+                                            <>
+                                                {start && format(start, "d 'de' MMM", { locale: es })}{" "}
+                                                -{" "}
+                                                {end && format(end, "d 'de' MMM", { locale: es })}
+                                            </>
+                                        )}
+                                    </p>
                                 </div>
                                 <Button
                                     variant="link"
