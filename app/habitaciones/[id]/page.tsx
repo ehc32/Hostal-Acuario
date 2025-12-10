@@ -14,6 +14,7 @@ import {
 import { BookingCard } from "../../../components/booking-card"
 import { ReviewsSection } from "@/components/reviews-section"
 import { FavoriteButton } from "@/components/favorite-button"
+import { RoomGallery } from "@/components/room-gallery"
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import { Metadata } from 'next'
@@ -87,33 +88,9 @@ export default async function RoomPage({ params }: RoomPageProps) {
         </div>
 
         {/* Galería */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 rounded-2xl overflow-hidden mb-8 h-[400px] md:h-[500px]">
-          <div className="relative h-full">
-            <Image
-              src={images[0]}
-              alt={room.title}
-              fill
-              className="object-cover hover:scale-105 transition-transform duration-700"
-              priority
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-2 h-full">
-            {images.slice(1, 5).map((image, index) => (
-              <div key={index} className="relative h-full">
-                <Image
-                  src={image}
-                  alt={`${room.title} - Foto ${index + 2}`}
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-            ))}
-            {images.length < 2 && (
-              <div className="relative h-full bg-muted flex items-center justify-center text-muted-foreground">
-                Más fotos pronto
-              </div>
-            )}
-          </div>
+        {/* Galería */}
+        <div className="mb-8">
+          <RoomGallery images={images} title={room.title} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">

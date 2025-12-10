@@ -29,7 +29,7 @@ export function BookingCard({ room }: BookingCardProps) {
     const [guests, setGuests] = React.useState(1)
 
     // Si la habitación tiene precio por hora, permitimos elegir
-    const hasHourlyOption = room.priceHour && room.priceHour > 0
+    const hasHourlyOption = (room.priceHour || 0) > 0
     const [bookingType, setBookingType] = React.useState<"NIGHTLY" | "HOURLY">("NIGHTLY")
 
     const handleReserveClick = () => {
