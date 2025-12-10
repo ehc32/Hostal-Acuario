@@ -40,12 +40,19 @@ model Room {
   holder      String
   images      String[]
   amenities   String[]
+  climate     ClimateType @default(NONE)
   reservations Reservation[]
   favorites    Favorite[]
   Review       Review[]
 
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+}
+
+enum ClimateType {
+  AIRE
+  VENTILADOR
+  NONE
 }
 
 enum ReservationStatus {

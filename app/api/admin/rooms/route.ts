@@ -43,6 +43,7 @@ export async function POST(req: Request) {
                 holder: body.holder || "Anfitrión",
                 images: body.images || [],
                 amenities: body.amenities || [],
+                climate: body.climate || "NONE",
                 slug: slug,
                 rating: 5.0, // Default rating inicial
                 reviews: 0

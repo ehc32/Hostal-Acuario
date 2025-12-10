@@ -19,12 +19,15 @@ import { Badge } from "@/components/ui/badge"
 import { IconX, IconUpload, IconLoader, IconPlus } from "@tabler/icons-react"
 import { toast } from "sonner"
 import Image from "next/image"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 const roomSchema = z.object({
     title: z.string().min(3, "El título es requerido"),
     slug: z.string().min(3, "El slug es requerido").regex(/^[a-z0-9-]+$/, "Solo letras minúsculas, números y guiones"),
     description: z.string().min(10, "La descripción es muy corta"),
     price: z.coerce.number().min(1, "El precio debe ser mayor a 0"),
+    priceHour: z.coerce.number().optional().default(0),
+    climate: z.enum(["AIRE", "VENTILADOR", "NONE"]).default("NONE"),
     holder: z.string().optional(),
     images: z.array(z.string()),
     amenities: z.array(z.string()),
@@ -51,6 +54,8 @@ export function RoomForm({ initialData, onSubmit, isLoading }: RoomFormProps) {
         slug: initialData?.slug || "",
         description: initialData?.description || "",
         price: initialData?.price ? Number(initialData.price) : 0,
+        priceHour: initialData?.priceHour ? Number(initialData.priceHour) : 0,
+        climate: initialData?.climate || "NONE",
         holder: initialData?.holder || "Admin",
         images: initialData?.images || [],
         amenities: [],
@@ -221,7 +226,7 @@ export function RoomForm({ initialData, onSubmit, isLoading }: RoomFormProps) {
                     )}
                 />
 
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-3">
                     <FormField
                         control={form.control}
                         name="slug"
@@ -235,7 +240,7 @@ export function RoomForm({ initialData, onSubmit, isLoading }: RoomFormProps) {
                                         className="font-mono text-sm"
                                     />
                                 </FormControl>
-                                <p className="text-xs text-muted-foreground">Se genera automáticamente, pero puedes editarlo</p>
+                                <p className="text-xs text-muted-foreground">Se genera automáticamente</p>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -247,8 +252,22 @@ export function RoomForm({ initialData, onSubmit, isLoading }: RoomFormProps) {
                             <FormItem>
                                 <FormLabel>Precio por noche (COP)</FormLabel>
                                 <FormControl>
-                                    <Input type="number" placeholder="0" {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
+                                    <Input type="number" placeholder="90000" {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
                                 </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="priceHour"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Precio por Rato (3H)</FormLabel>
+                                <FormControl>
+                                    <Input type="number" placeholder="40000" {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
+                                </FormControl>
+                                <p className="text-xs text-muted-foreground">Opcional. Deja 0 si no aplica.</p>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -267,6 +286,49 @@ export function RoomForm({ initialData, onSubmit, isLoading }: RoomFormProps) {
                                     className="min-h-[200px] text-base leading-relaxed resize-y"
                                     {...field}
                                 />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="climate"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                            <FormLabel>Tipo de Climatización</FormLabel>
+                            <FormControl>
+                                <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                    className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-4"
+                                >
+                                    <FormItem className="flex items-center space-x-2 space-y-0">
+                                        <FormControl>
+                                            <RadioGroupItem value="AIRE" />
+                                        </FormControl>
+                                        <FormLabel className="font-normal cursor-pointer">
+                                            Aire Acondicionado ❄️
+                                        </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-2 space-y-0">
+                                        <FormControl>
+                                            <RadioGroupItem value="VENTILADOR" />
+                                        </FormControl>
+                                        <FormLabel className="font-normal cursor-pointer">
+                                            Ventilador 🌀
+                                        </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-2 space-y-0">
+                                        <FormControl>
+                                            <RadioGroupItem value="NONE" />
+                                        </FormControl>
+                                        <FormLabel className="font-normal cursor-pointer">
+                                            Ninguno
+                                        </FormLabel>
+                                    </FormItem>
+                                </RadioGroup>
                             </FormControl>
                             <FormMessage />
                         </FormItem>

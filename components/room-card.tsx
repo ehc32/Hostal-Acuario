@@ -11,7 +11,8 @@ interface RoomCardProps {
   title: string
   description?: string
   price: number
-  priceHour?: number // Nuevo campo opcional
+  priceHour?: number
+  climate?: string // Nuevo campo opcional
   rating: number
   reviews: number
   images: string[]
@@ -29,6 +30,7 @@ export function RoomCard({
   description,
   price,
   priceHour,
+  climate,
   rating,
   reviews,
   images,
@@ -127,15 +129,29 @@ export function RoomCard({
         {/* Image Container (mismo código) */}
         <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-200">
 
-          {/* Guest Favorite Badge */}
-          {(isGuestFavorite || rating >= 4.8) && (
+          {/* Climate Badge */}
+          {climate === 'AIRE' && (
             <div className="absolute top-3 left-3 z-20">
+              <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                ❄️ Aire Acondicionado
+              </span>
+            </div>
+          )}
+          {climate === 'VENTILADOR' && (
+            <div className="absolute top-3 left-3 z-20">
+              <span className="inline-flex items-center rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700 ring-1 ring-inset ring-orange-600/20">
+                🌀 Ventilador
+              </span>
+            </div>
+          )}
+
+          {/* Guest Favorite Badge (Moved down if climate exists, or kept if not) */}
+          {(isGuestFavorite || rating >= 4.8) && (
+            <div className={`absolute ${climate && climate !== 'NONE' ? 'top-10' : 'top-3'} left-3 z-20`}>
               <div className="relative shadow-sm">
-                <div
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm shadow-sm"
-                >
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm shadow-sm">
                   <span className="text-[12px] font-semibold text-slate-900 tracking-tight">
-                    Favorito entre huéspedes
+                    Favorito
                   </span>
                 </div>
               </div>

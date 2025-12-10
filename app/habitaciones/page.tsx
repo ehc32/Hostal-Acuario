@@ -114,6 +114,8 @@ export default async function HabitacionesPage({
                   price={room.price}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   priceHour={(room as any).priceHour}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  climate={(room as any).climate}
                   rating={room.rating}
                   reviews={room.reviews}
                   images={room.images}
