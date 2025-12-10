@@ -19,7 +19,7 @@ export default function ProfilePage() {
 
         // Si es ADMIN, redirigir al dashboard
         if (user && user.role === "ADMIN") {
-            router.push('/dashboard')
+            router.push('/admin')
         }
     }, [user, loading, router])
 
