@@ -9,9 +9,9 @@ export default async function ClientesPage() {
 
     const formattedClients: ClientColumn[] = users.map((user) => ({
         id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
+        name: user.name ?? "Sin nombre",
+        email: user.email ?? "",
+        phone: user.phone ?? "",
         role: user.role,
         status: user.status,
         createdAt: user.createdAt
