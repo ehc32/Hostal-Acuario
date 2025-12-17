@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma"
 import { DataTable } from "./data-table"
 import { columns, ReservationColumn } from "./columns"
 
+export const dynamic = 'force-dynamic'
+
 export default async function ReservasPage() {
     // Cast a 'any' para evitar conflictos con tipos desactualizados
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

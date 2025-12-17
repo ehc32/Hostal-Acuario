@@ -40,8 +40,12 @@ export function ReservationCellAction({ reservation }: ReservationCellActionProp
     const onDelete = async () => {
         try {
             setLoading(true)
+            const token = localStorage.getItem("token")
             const res = await fetch(`/api/admin/reservas/${reservation.id}`, {
                 method: "DELETE",
+                headers: {
+                    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                }
             })
 
             if (!res.ok) throw new Error("Error al eliminar")

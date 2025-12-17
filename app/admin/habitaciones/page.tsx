@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma"
 import { DataTable } from "./data-table"
 import { columns, RoomColumn } from "./columns"
 
+export const dynamic = 'force-dynamic'
+
 export default async function HabitacionesPage() {
     const rooms = await prisma.room.findMany({
         orderBy: { createdAt: 'desc' }
