@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
+
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -14,7 +15,7 @@ import {
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
     Table,
@@ -23,29 +24,31 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { DataTablePagination } from "@/components/data-table/pagination"
-import { DataTableViewOptions } from "@/components/data-table/column-toggle"
-import { DataTableFacetedFilter } from "@/components/data-table/faceted-filter"
-import { statusOptions } from "./columns"
-import { X } from "lucide-react"
+import { Input } from "@/components/ui/input";
+import { DataTablePagination } from "./pagination";
+import { DataTableViewOptions } from "./column-toggle";
 
 interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[]
-    data: TData[]
+    columns: ColumnDef<TData, TValue>[];
+    data: TData[];
+    filterColumn?: string;
+    filterPlaceholder?: string;
+    toolbar?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
+    filterColumn,
+    filterPlaceholder = "Buscar...",
+    toolbar,
 }: DataTableProps<TData, TValue>) {
-    const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-    const [rowSelection, setRowSelection] = React.useState({})
+    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [rowSelection, setRowSelection] = React.useState({});
 
     const table = useReactTable({
         data,
@@ -67,46 +70,30 @@ export function DataTable<TData, TValue>({
         getSortedRowModel: getSortedRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
-    })
-
-    const isFiltered = table.getState().columnFilters.length > 0
+    });
 
     return (
         <div className="space-y-4">
             {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex flex-1 items-center gap-2 flex-wrap">
-                    <Input
-                        placeholder="Buscar cliente..."
-                        value={(table.getColumn("userName")?.getFilterValue() as string) ?? ""}
-                        onChange={(event) =>
-                            table.getColumn("userName")?.setFilterValue(event.target.value)
-                        }
-                        className="h-8 w-[150px] lg:w-[250px]"
-                    />
-                    {table.getColumn("status") && (
-                        <DataTableFacetedFilter
-                            column={table.getColumn("status")}
-                            title="Estado"
-                            options={statusOptions}
+            <div className="flex items-center justify-between gap-2">
+                <div className="flex flex-1 items-center gap-2">
+                    {filterColumn && (
+                        <Input
+                            placeholder={filterPlaceholder}
+                            value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
+                            onChange={(event) =>
+                                table.getColumn(filterColumn)?.setFilterValue(event.target.value)
+                            }
+                            className="h-8 w-[150px] lg:w-[250px]"
                         />
                     )}
-                    {isFiltered && (
-                        <Button
-                            variant="ghost"
-                            onClick={() => table.resetColumnFilters()}
-                            className="h-8 px-2 lg:px-3"
-                        >
-                            Limpiar
-                            <X className="ml-2 h-4 w-4" />
-                        </Button>
-                    )}
+                    {toolbar}
                 </div>
                 <DataTableViewOptions table={table} />
             </div>
 
             {/* Table */}
-            <div className="rounded-lg border bg-background">
+            <div className="rounded-md border bg-background">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -121,7 +108,7 @@ export function DataTable<TData, TValue>({
                                                     header.getContext()
                                                 )}
                                         </TableHead>
-                                    )
+                                    );
                                 })}
                             </TableRow>
                         ))}
@@ -149,7 +136,7 @@ export function DataTable<TData, TValue>({
                                     colSpan={columns.length}
                                     className="h-24 text-center"
                                 >
-                                    No hay reservas que coincidan.
+                                    No hay resultados.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -160,5 +147,5 @@ export function DataTable<TData, TValue>({
             {/* Pagination */}
             <DataTablePagination table={table} />
         </div>
-    )
+    );
 }

@@ -2,10 +2,9 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ArrowUpDown, Trash2 } from "lucide-react"
-import Link from "next/link"
-import { DeleteReservationButton } from "@/components/admin/delete-reservation-button"
+import { CheckCircle, XCircle, Clock } from "lucide-react"
+import { DataTableColumnHeader } from "@/components/data-table/column-header"
+import { ReservationCellAction } from "./cell-action"
 
 export type ReservationColumn = {
     id: number
@@ -17,72 +16,127 @@ export type ReservationColumn = {
     total: number
 }
 
+// Status options para filtrado
+export const statusOptions = [
+    { label: "Pendiente", value: "PENDING", icon: Clock },
+    { label: "Confirmada", value: "CONFIRMED", icon: CheckCircle },
+    { label: "Completada", value: "COMPLETED", icon: CheckCircle },
+    { label: "Cancelada", value: "CANCELLED", icon: XCircle },
+]
+
 export const columns: ColumnDef<ReservationColumn>[] = [
     {
         accessorKey: "id",
-        header: "ID",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="# ID" />
+        ),
+        cell: ({ row }) => (
+            <div className="font-mono text-xs text-muted-foreground">
+                #{row.getValue("id")}
+            </div>
+        ),
     },
     {
         accessorKey: "userName",
-        header: "Cliente",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Cliente" />
+        ),
+        cell: ({ row }) => (
+            <div className="font-medium">{row.getValue("userName")}</div>
+        ),
     },
     {
         accessorKey: "roomTitle",
-        header: "Habitación",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Habitación" />
+        ),
+        cell: ({ row }) => (
+            <div className="max-w-[200px] truncate">{row.getValue("roomTitle")}</div>
+        ),
     },
     {
         accessorKey: "checkIn",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Check-in
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            )
-        },
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Entrada" />
+        ),
         cell: ({ row }) => {
-            return new Date(row.getValue("checkIn")).toLocaleDateString()
+            const date = new Date(row.getValue("checkIn"))
+            return (
+                <div className="text-sm">
+                    {date.toLocaleDateString('es-CO', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    })}
+                </div>
+            )
         },
     },
     {
         accessorKey: "checkOut",
-        header: "Check-out",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Salida" />
+        ),
         cell: ({ row }) => {
-            return new Date(row.getValue("checkOut")).toLocaleDateString()
-        },
-    },
-    {
-        accessorKey: "status",
-        header: "Estado",
-        cell: ({ row }) => {
-            const status = row.getValue("status") as string
-
-            const statusConfig = {
-                PENDING: { label: "Pendiente", variant: "outline" as const, className: "text-yellow-600 border-yellow-200 bg-yellow-50" },
-                CONFIRMED: { label: "Confirmada", variant: "default" as const, className: "bg-green-100 text-green-700 border-green-200" },
-                COMPLETED: { label: "Completada", variant: "secondary" as const, className: "bg-slate-100 text-slate-700" },
-                CANCELLED: { label: "Cancelada", variant: "destructive" as const, className: "bg-red-100 text-red-700 border-red-200" }
-            }
-
-            const config = statusConfig[status as keyof typeof statusConfig] || {
-                label: status,
-                variant: "outline" as const,
-                className: "text-slate-600 border-slate-200 bg-slate-50"
-            }
-
+            const date = new Date(row.getValue("checkOut"))
             return (
-                <Badge variant={config.variant} className={config.className}>
-                    {config.label}
-                </Badge>
+                <div className="text-sm">
+                    {date.toLocaleDateString('es-CO', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    })}
+                </div>
             )
         },
     },
     {
+        accessorKey: "status",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Estado" />
+        ),
+        cell: ({ row }) => {
+            const status = row.getValue("status") as string
+
+            const statusConfig: Record<string, { label: string; className: string }> = {
+                PENDING: {
+                    label: "Pendiente",
+                    className: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
+                },
+                CONFIRMED: {
+                    label: "Confirmada",
+                    className: "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+                },
+                COMPLETED: {
+                    label: "Completada",
+                    className: "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                },
+                CANCELLED: {
+                    label: "Cancelada",
+                    className: "bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                }
+            }
+
+            const config = statusConfig[status] || {
+                label: status,
+                className: "bg-slate-50 text-slate-600 border-slate-200"
+            }
+
+            return (
+                <Badge variant="outline" className={config.className}>
+                    {config.label}
+                </Badge>
+            )
+        },
+        filterFn: (row, id, value) => {
+            return value.includes(row.getValue(id))
+        },
+    },
+    {
         accessorKey: "total",
-        header: "Total",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Total" />
+        ),
         cell: ({ row }) => {
             const amount = parseFloat(row.getValue("total"))
             const formatted = new Intl.NumberFormat("es-CO", {
@@ -90,21 +144,11 @@ export const columns: ColumnDef<ReservationColumn>[] = [
                 currency: "COP",
                 maximumFractionDigits: 0
             }).format(amount)
-            return <div className="font-medium">{formatted}</div>
+            return <div className="font-semibold text-slate-900">{formatted}</div>
         },
     },
     {
         id: "actions",
-        cell: ({ row }) => {
-            const reservation = row.original
-            return (
-                <div className="flex items-center gap-2">
-                    <Link href={`/admin/reservas/${reservation.id}`}>
-                        <Button variant="ghost" size="sm">Ver detalles</Button>
-                    </Link>
-                    <DeleteReservationButton id={reservation.id} />
-                </div>
-            )
-        },
+        cell: ({ row }) => <ReservationCellAction reservation={row.original} />,
     },
 ]

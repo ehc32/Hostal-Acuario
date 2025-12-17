@@ -1,13 +1,11 @@
-import { RoomCard } from "./room-card"
-import Link from "next/link"
-import { ChevronRight } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import { RoomsGridClient } from "./rooms-grid-client"
 
 async function getRooms() {
   try {
     const rooms = await prisma.room.findMany({
-      take: 8,
-      orderBy: { createdAt: 'desc' }
+      take: 50,
+      orderBy: { createdAt: 'desc' } // O 'asc' si prefieren orden específico
     })
     return rooms
   } catch (error) {
@@ -18,8 +16,6 @@ async function getRooms() {
 
 export async function RoomsGrid() {
   const rooms = await getRooms()
-  const hasMoreRooms = rooms.length > 8
-  const roomsToShow = rooms.slice(0, 8)
 
   return (
     <section className="py-20 px-4 md:px-8 lg:px-16 bg-background">
@@ -40,48 +36,8 @@ export async function RoomsGrid() {
           </p>
         </div>
 
-        {/* GRID */}
-        {rooms.length === 0 ? (
-          <div className="text-center py-10 text-muted-foreground">
-            <p>No hay habitaciones disponibles en este momento.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-15">
-            {roomsToShow.map((room) => (
-              <RoomCard
-                key={room.id}
-                id={room.slug}
-                dbId={room.id}
-                title={room.title}
-                description={room.description}
-                price={room.price}
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                priceHour={(room as any).priceHour}
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                climate={(room as any).climate}
-                rating={room.rating}
-                reviews={room.reviews}
-                images={room.images}
-                amenities={room.amenities}
-                holder={room.holder}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* BOTÓN VER MÁS */}
-        {hasMoreRooms && (
-          <div className="flex justify-center mt-12">
-            <Link
-              href="/habitaciones"
-              className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 
-              text-white font-medium px-6 py-3 rounded-full transition"
-            >
-              Ver más habitaciones
-              <ChevronRight className="w-5 h-5" />
-            </Link>
-          </div>
-        )}
+        {/* CLIENT GRID & PAGINATION */}
+        <RoomsGridClient rooms={rooms} />
 
       </div>
     </section>

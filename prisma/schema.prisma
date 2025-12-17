@@ -111,3 +111,29 @@ model Review {
   room      Room     @relation(fields: [roomId], references: [id])
   createdAt DateTime @default(now())
 }
+
+model Configuration {
+  id Int @id @default(1)
+
+  // General
+  siteName     String  @default("Hostal Acuario")
+  siteDescription String?
+  supportEmail String?
+
+  // Hotel Info
+  address String?
+  phone   String?
+
+  // Cloudinary
+  cloudinaryCloudName String?
+  cloudinaryApiKey    String?
+  cloudinaryApiSecret String?
+
+  // SMTP
+  smtpHost String?
+  smtpPort String?
+  smtpUser String?
+  smtpPass String?
+
+  updatedAt DateTime @updatedAt
+}

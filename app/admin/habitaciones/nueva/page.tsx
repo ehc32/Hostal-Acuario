@@ -3,7 +3,7 @@
 import { RoomForm } from "@/components/admin/room-form"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { IconArrowLeft } from "@tabler/icons-react"
+import { ChevronLeft } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
@@ -48,19 +48,22 @@ export default function NuevaHabitacionPage() {
     }
 
     return (
-        <div className="w-full space-y-6 py-4 px-4 md:px-6">
-            <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" asChild>
+        <div className="max-w-5xl mx-auto py-8 px-6 space-y-8">
+            <div className="flex items-center gap-4">
+                <Button variant="outline" size="icon" className="h-9 w-9" asChild>
                     <Link href="/admin/habitaciones">
-                        <IconArrowLeft />
+                        <ChevronLeft className="h-4 w-4" />
                     </Link>
                 </Button>
-                <h1 className="text-2xl font-bold">Nueva Habitación</h1>
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Nueva Habitación</h1>
+                    <p className="text-sm text-slate-500">
+                        Ingresa los detalles para registrar una nueva habitación en el sistema.
+                    </p>
+                </div>
             </div>
 
-            <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
-                <RoomForm onSubmit={handleSubmit} />
-            </div>
+            <RoomForm onSubmit={handleSubmit} />
         </div>
     )
 }

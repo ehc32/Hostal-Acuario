@@ -1,29 +1,20 @@
 "use client"
 
 import * as React from "react"
-import { RoomForm } from "@/components/admin/room-form"
+import { RoomForm, RoomFormValues } from "@/components/admin/room-form"
 import { useRouter, useParams } from "next/navigation"
 import { toast } from "sonner"
-import { IconArrowLeft, IconLoader } from "@tabler/icons-react"
+import { ChevronLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-
-interface RoomFormData {
-    title: string
-    slug: string
-    description: string
-    price: number
-    images: string[]
-    amenities: string[]
-    holder?: string
-}
 
 export default function EditarHabitacionPage() {
     const router = useRouter()
     const params = useParams()
     const id = params?.id as string
 
-    const [initialData, setInitialData] = React.useState<RoomFormData | null>(null)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [initialData, setInitialData] = React.useState<any>(null)
     const [loading, setLoading] = React.useState<boolean>(true)
 
     React.useEffect(() => {
@@ -32,13 +23,14 @@ export default function EditarHabitacionPage() {
             try {
                 const res = await fetch(`/api/admin/rooms/${id}`)
                 if (res.ok) {
-                    const data: RoomFormData = await res.json()
+                    const data = await res.json()
                     setInitialData(data)
                 } else {
                     toast.error("No se pudo cargar la habitación")
                 }
             } catch (error) {
                 console.error(error)
+                toast.error("Error de conexión al cargar")
             } finally {
                 setLoading(false)
             }
@@ -46,7 +38,7 @@ export default function EditarHabitacionPage() {
         fetchRoom()
     }, [id])
 
-    async function handleSubmit(data: RoomFormData) {
+    async function handleSubmit(data: RoomFormValues) {
         try {
             const token = localStorage.getItem("token")
 
@@ -73,29 +65,32 @@ export default function EditarHabitacionPage() {
     if (loading) {
         return (
             <div className="flex h-[50vh] w-full items-center justify-center">
-                <IconLoader className="animate-spin text-muted-foreground" />
+                <Loader2 className="animate-spin text-muted-foreground w-8 h-8" />
             </div>
         )
     }
 
     return (
-        <div className="w-full space-y-6 py-4 px-4 md:px-6">
-            <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" asChild>
+        <div className="max-w-5xl mx-auto py-8 px-6 space-y-8">
+            <div className="flex items-center gap-4">
+                <Button variant="outline" size="icon" className="h-9 w-9" asChild>
                     <Link href="/admin/habitaciones">
-                        <IconArrowLeft />
+                        <ChevronLeft className="h-4 w-4" />
                     </Link>
                 </Button>
-                <h1 className="text-2xl font-bold">Editar Habitación</h1>
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Editar Habitación</h1>
+                    <p className="text-sm text-slate-500">
+                        Modifica los detalles de la habitación {initialData?.title && `"${initialData.title}"`}.
+                    </p>
+                </div>
             </div>
 
-            <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
-                {initialData ? (
-                    <RoomForm initialData={initialData} onSubmit={handleSubmit} />
-                ) : (
-                    <div className="text-center py-10">No se encontró la habitación</div>
-                )}
-            </div>
+            {initialData ? (
+                <RoomForm initialData={initialData} onSubmit={handleSubmit} />
+            ) : (
+                <div className="text-center py-10 text-muted-foreground">No se encontró la habitación</div>
+            )}
         </div>
     )
 }

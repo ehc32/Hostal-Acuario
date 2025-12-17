@@ -70,7 +70,7 @@ export function RegisterForm({
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
-            {isLoading && <LoadingScreen title="Creando cuenta" description="Configurando tu perfil..." />}
+            {isLoading && <LoadingScreen fullscreen title="Creando cuenta" description="Configurando tu perfil..." />}
             <form onSubmit={handleSubmit}>
                 <FieldGroup>
                     <div className="flex flex-col items-center gap-2 text-center">

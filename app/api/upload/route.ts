@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
-
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -16,8 +11,24 @@ export async function POST(request: Request) {
     }
 
     try {
+        // Fetch config from DB
+        const config = await prisma.configuration.findUnique({ where: { id: 1 } });
+
+        if (!config || !config.cloudinaryCloudName || !config.cloudinaryApiKey || !config.cloudinaryApiSecret) {
+            console.error("Cloudinary configuration missing in DB");
+            return NextResponse.json({ error: "System upload misconfiguration" }, { status: 500 });
+        }
+
+        // Configure dynamically for this request
+        cloudinary.config({
+            cloud_name: config.cloudinaryCloudName,
+            api_key: config.cloudinaryApiKey,
+            api_secret: config.cloudinaryApiSecret
+        });
+
         const buffer = Buffer.from(await request.arrayBuffer());
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result: any = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
                 { folder: "uploads" },

@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Heart, Menu, User, LogOut, UserCircle, User2Icon, Database, LayoutDashboard } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { Heart, Menu, User, LogOut, UserCircle, LayoutDashboard, User2Icon } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import {
     DropdownMenu,
@@ -14,135 +15,270 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { ContactModal } from "@/components/contact-modal"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet"
+import { cn } from "@/lib/utils"
 
 export function Navbar() {
     const { user, logout } = useAuth()
-    const [showContact, setShowContact] = useState(false)
+    const [scrolled, setScrolled] = useState(false)
+    const pathname = usePathname()
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const isScrolled = window.scrollY > 20
+            if (isScrolled !== scrolled) {
+                setScrolled(isScrolled)
+            }
+        }
+
+        window.addEventListener("scroll", handleScroll, { passive: true })
+        return () => {
+            window.removeEventListener("scroll", handleScroll)
+        }
+    }, [scrolled])
 
     const menuItems = [
         { label: "Inicio", href: "/" },
         { label: "Habitaciones", href: "/habitaciones" },
         { label: "Información", href: "/#informacion" },
-        { label: "Contacto", action: () => setShowContact(true) },
     ]
 
     return (
-        <>
-            <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
-                <div className="container mx-auto flex items-center justify-between px-4 py-3">
-
+        <header
+            className={cn(
+                "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out border-b",
+                scrolled
+                    ? "bg-white/80 backdrop-blur-md shadow-sm border-gray-200/50 py-3"
+                    : "bg-white border-transparent py-4"
+            )}
+        >
+            <div className="container mx-auto px-4 md:px-6">
+                <div className="flex items-center justify-between">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2">
-                        <Image
-                            src="/logo.png"
-                            alt="Hotel Acuario Logo"
-                            width={38}
-                            height={38}
-                            className="object-contain"
-                        />
-                        <span className="font-semibold text-base text-gray-900">
-                            Hotel Acuario
+                    <Link href="/" className="flex items-center gap-2 group transition-opacity hover:opacity-90">
+                        <div className="relative w-10 h-10 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
+                            <Image
+                                src="/logo.png"
+                                alt="Hotel Acuario Logo"
+                                fill
+                                className="object-cover"
+                            />
+                        </div>
+                        <span className="font-bold text-lg text-gray-900 tracking-tight hidden sm:block">
+                            Hostal Acuario
                         </span>
                     </Link>
 
-                    {/* Desktop Menu */}
-                    <div className="hidden md:flex items-center gap-6">
-                        {menuItems.map((item) => (
-                            item.action ? (
-                                <button
-                                    key={item.label}
-                                    onClick={item.action}
-                                    className="relative text-gray-800 font-medium py-1 group text-sm hover:text-amber-600 transition-colors"
-                                >
-                                    {item.label}
-                                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-amber-500 transition-all duration-300 group-hover:w-full" />
-                                </button>
-                            ) : (
+                    {/* Desktop Navigation */}
+                    <nav className="hidden md:flex items-center gap-1">
+                        {menuItems.map((item) => {
+                            const isActive = pathname === item.href
+                            return (
                                 <Link
                                     key={item.label}
-                                    href={item.href!}
-                                    className="relative text-gray-800 font-medium py-1 group text-sm"
+                                    href={item.href}
+                                    className={cn(
+                                        "relative px-4 py-2 text-sm font-medium transition-colors rounded-full hover:text-amber-600 hover:bg-amber-50",
+                                        isActive ? "text-amber-600 bg-amber-50/50" : "text-gray-600"
+                                    )}
                                 >
                                     {item.label}
-                                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-amber-500 transition-all duration-300 group-hover:w-full" />
                                 </Link>
                             )
-                        ))}
-                    </div>
-
-                    {/* Right side */}
-                    <div className="flex items-center gap-4">
-
-                        {/* Favoritos */}
+                        })}
                         <Link
-                            href="/favoritos"
-                            className="flex items-center gap-1 text-gray-700 hover:text-amber-600 transition-colors text-sm"
+                            href="#contacto"
+                            className="px-4 py-2 text-sm font-medium text-gray-600 transition-colors rounded-full hover:text-amber-600 hover:bg-amber-50"
                         >
-                            <Heart className="w-4 h-4" />
-                            <span className="hidden md:inline font-medium">Favoritos</span>
+                            Contacto
                         </Link>
+                    </nav>
 
-                        {/* Auth Section */}
-                        {user ? (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-amber-600 hover:bg-transparent px-2">
-                                        <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-                                            {user.name ? user.name[0].toUpperCase() : <User className="h-4 w-4" />}
-                                        </div>
-                                        <span className="hidden md:inline">Mi Cuenta</span>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56">
-                                    <DropdownMenuLabel>
-                                        <div className="flex flex-col space-y-1">
-                                            <p className="text-sm font-medium leading-none">{user.name || 'Usuario'}</p>
-                                            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                                        </div>
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/profile" className="cursor-pointer w-full flex items-center">
-                                            <UserCircle className="mr-2 h-4 w-4" /> Mi Perfil
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    {user.role === 'ADMIN' && (
+                    {/* Right Section */}
+                    <div className="flex items-center gap-2 md:gap-4">
+                        {/* Desktop Actions */}
+                        <div className="hidden md:flex items-center gap-2">
+                            <Link href="/favoritos">
+                                <Button variant="ghost" size="icon" className="text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded-full">
+                                    <Heart className="w-5 h-5" />
+                                    <span className="sr-only">Favoritos</span>
+                                </Button>
+                            </Link>
+
+                            {user ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="relative h-9 w-9 rounded-full border border-gray-200 p-0 hover:bg-amber-50 hover:border-amber-200 transition-all">
+                                            <div className="flex h-full w-full items-center justify-center rounded-full bg-amber-100/50 text-amber-700">
+                                                {user.name ? (
+                                                    <span className="font-semibold text-sm">{user.name[0].toUpperCase()}</span>
+                                                ) : (
+                                                    <User className="h-4 w-4" />
+                                                )}
+                                            </div>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-56 p-2" forceMount>
+                                        <DropdownMenuLabel className="font-normal">
+                                            <div className="flex flex-col space-y-1">
+                                                <p className="text-sm font-medium leading-none">{user.name || 'Usuario'}</p>
+                                                <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                                            </div>
+                                        </DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>
-                                            <Link href="/admin" className="cursor-pointer w-full flex items-center">
-                                                <span className="mr-2">
-                                                    <LayoutDashboard />
-                                                </span> Panel Admin
+                                            <Link href="/profile" className="cursor-pointer flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-amber-50 hover:text-amber-700">
+                                                <UserCircle className="h-4 w-4" />
+                                                <span>Mi Perfil</span>
                                             </Link>
                                         </DropdownMenuItem>
-                                    )}
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-600 w-full flex items-center">
-                                        <LogOut className="mr-2 h-4 w-4" /> Cerrar Sesión
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        ) : (
-                            <div className="flex items-center gap-2">
-                                <Button variant="ghost" asChild className="text-sm font-medium text-gray-700 hover:text-amber-600">
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/favoritos" className="cursor-pointer flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-amber-50 hover:text-amber-700">
+                                                <Heart className="h-4 w-4" />
+                                                <span>Mis Favoritos</span>
+                                            </Link>
+                                        </DropdownMenuItem>
+                                        {user.role === 'ADMIN' && (
+                                            <DropdownMenuItem asChild>
+                                                <Link href="/admin" className="cursor-pointer flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-amber-50 hover:text-amber-700">
+                                                    <LayoutDashboard className="h-4 w-4" />
+                                                    <span>Panel Admin</span>
+                                                </Link>
+                                            </DropdownMenuItem>
+                                        )}
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem onClick={logout} className="cursor-pointer flex items-center gap-2 rounded-md px-2 py-1.5 text-red-600 hover:bg-red-50 hover:text-red-700 focus:bg-red-50 focus:text-red-700">
+                                            <LogOut className="h-4 w-4" />
+                                            <span>Cerrar Sesión</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <Button asChild size="sm" className="bg-amber-600 text-white hover:bg-amber-700 rounded-full px-5 shadow-sm hover:shadow transition-all">
                                     <Link href="/login" className="flex items-center gap-2">
                                         <User2Icon className="h-4 w-4" />
-                                        Iniciar Sesión
+                                        <span>Entrar</span>
                                     </Link>
                                 </Button>
+                            )}
+                        </div>
 
-                            </div>
-                        )}
+                        {/* Mobile Menu */}
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <Button variant="ghost" size="icon" className="md:hidden text-gray-700 hover:bg-gray-100 rounded-full">
+                                    <Menu className="h-6 w-6" />
+                                    <span className="sr-only">Abrir menú</span>
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent side="right" className="w-[300px] sm:w-[350px] p-0 border-l border-gray-100">
+                                <SheetHeader className="p-6 border-b border-gray-100 bg-gray-50/50">
+                                    <SheetTitle className="flex items-center gap-2">
+                                        <Image
+                                            src="/logo.png"
+                                            alt="Hotel Acuario"
+                                            width={32}
+                                            height={32}
+                                            className="object-contain"
+                                        />
+                                        <span className="font-bold text-gray-900">Hotel Acuario</span>
+                                    </SheetTitle>
+                                    <SheetDescription>
+                                        Bienvenido a tu mejor experiencia.
+                                    </SheetDescription>
+                                </SheetHeader>
 
-                        {/* Mobile Menu Button - Podría implementarse un sheet lateral si se desea */}
-                        <Button variant="ghost" size="icon" className="md:hidden">
-                            <Menu className="h-5 w-5" />
-                        </Button>
+                                <div className="flex flex-col py-4">
+                                    <div className="px-4 mb-4">
+                                        {user ? (
+                                            <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <div className="h-10 w-10 rounded-full bg-amber-200 flex items-center justify-center text-amber-700 font-semibold text-lg">
+                                                        {user.name ? user.name[0].toUpperCase() : <User />}
+                                                    </div>
+                                                    <div className="overflow-hidden">
+                                                        <p className="font-medium text-gray-900 truncate">{user.name || 'Usuario'}</p>
+                                                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <Button asChild variant="outline" size="sm" className="w-full text-xs justify-start h-8">
+                                                        <Link href="/profile">
+                                                            <UserCircle className="w-3 h-3 mr-2" />
+                                                            Perfil
+                                                        </Link>
+                                                    </Button>
+                                                    {user.role === 'ADMIN' && (
+                                                        <Button asChild variant="outline" size="sm" className="w-full text-xs justify-start h-8">
+                                                            <Link href="/admin">
+                                                                <LayoutDashboard className="w-3 h-3 mr-2" />
+                                                                Admin
+                                                            </Link>
+                                                        </Button>
+                                                    )}
+                                                    <Button variant="ghost" size="sm" onClick={logout} className="w-full text-xs text-red-600 hover:text-red-700 hover:bg-red-50 justify-start h-8 col-span-2">
+                                                        <LogOut className="w-3 h-3 mr-2" />
+                                                        Cerrar sesión
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <Button asChild className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-xl py-6 shadow-md shadow-amber-200/50">
+                                                <Link href="/login" className="flex items-center justify-center gap-2">
+                                                    <User2Icon className="h-5 w-5" />
+                                                    <span className="text-base">Iniciar Sesión / Registro</span>
+                                                </Link>
+                                            </Button>
+                                        )}
+                                    </div>
+
+                                    <div className="flex flex-col px-2">
+                                        {menuItems.map((item) => (
+                                            <Link
+                                                key={item.href}
+                                                href={item.href}
+                                                className={cn(
+                                                    "flex items-center gap-4 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                                                    pathname === item.href
+                                                        ? "bg-amber-50 text-amber-700"
+                                                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                                )}
+                                            >
+                                                {item.label}
+                                            </Link>
+                                        ))}
+                                        <Link
+                                            href="#contacto"
+                                            className="flex items-center gap-4 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                                        >
+                                            Contacto
+                                        </Link>
+                                        <Link
+                                            href="/favoritos"
+                                            className={cn(
+                                                "flex items-center gap-4 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                                                pathname === "/favoritos"
+                                                    ? "bg-amber-50 text-amber-700"
+                                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                            )}
+                                        >
+                                            Favoritos
+                                        </Link>
+                                    </div>
+
+                                    <div className="mt-auto px-6 py-6 border-t border-gray-100">
+                                        <p className="text-xs text-center text-gray-400">
+                                            © {new Date().getFullYear()} Hotel Acuario.
+                                            <br />
+                                            Todos los derechos reservados.
+                                        </p>
+                                    </div>
+                                </div>
+                            </SheetContent>
+                        </Sheet>
                     </div>
                 </div>
-            </nav>
-
-            <ContactModal isOpen={showContact} onClose={() => setShowContact(false)} />
-        </>
+            </div>
+        </header>
     )
 }

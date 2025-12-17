@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getAuthFromRequest } from "@/lib/auth"
+import { ClimateType } from "@prisma/client"
 
 type Params = {
     params: Promise<{ id: string }>
@@ -37,6 +38,12 @@ export async function PUT(req: Request, props: Params) {
         const id = Number(params.id)
         const body = await req.json()
 
+        // Mapear clima correctamente
+        let climate: ClimateType = ClimateType.NONE
+        if (body.climate === 'AIRE') climate = ClimateType.AIRE
+        if (body.climate === 'VENTILADOR') climate = ClimateType.VENTILADOR
+        if (body.climate === 'NONE') climate = ClimateType.NONE
+
         const room = await prisma.room.update({
             where: { id },
             data: {
@@ -44,6 +51,8 @@ export async function PUT(req: Request, props: Params) {
                 slug: body.slug,
                 description: body.description,
                 price: Number(body.price),
+                priceHour: body.priceHour ? Number(body.priceHour) : 0,
+                climate: climate,
                 images: body.images,
                 amenities: body.amenities,
                 holder: body.holder

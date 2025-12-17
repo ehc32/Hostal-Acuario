@@ -18,7 +18,11 @@ export async function GET(req: Request) {
                 email: true,
                 role: true,
                 status: true,
-                createdAt: true
+                phone: true,      // Aseguramos traer teléfono
+                createdAt: true,
+                _count: {         // Traemos conteos útiles
+                    select: { reservations: true }
+                }
             },
             orderBy: { createdAt: 'desc' }
         })
@@ -42,9 +46,16 @@ export async function PUT(req: Request) {
 
         if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 })
 
+        // Construir objeto data dinámicamente para permitir actualizaciones parciales
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const data: any = {}
+        if (name !== undefined) data.name = name
+        if (role !== undefined) data.role = role
+        if (status !== undefined) data.status = status
+
         const updatedUser = await prisma.user.update({
             where: { id: Number(id) },
-            data: { name, role, status }
+            data: data
         })
 
         return NextResponse.json(updatedUser)

@@ -29,27 +29,35 @@ export async function POST(req: Request) {
             }
         })
 
+        // -- Load config from DB --
+        const config = await prisma.configuration.findUnique({ where: { id: 1 } });
+
+        if (!config || !config.smtpHost || !config.smtpUser || !config.smtpPass) {
+            console.error("SMTP configuration missing in DB");
+            return NextResponse.json({ error: "System email misconfiguration" }, { status: 500 });
+        }
+
         // Configurar transporte de correo
         const transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port: Number(process.env.EMAIL_PORT),
+            host: config.smtpHost,
+            port: Number(config.smtpPort || 587),
             secure: false, // true para 465, false para otros puertos
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
+                user: config.smtpUser,
+                pass: config.smtpPass,
             },
         })
 
         // Enviar correo
         await transporter.sendMail({
-            from: `"Hostal Acuario" <${process.env.EMAIL_USER}>`,
+            from: `"${config.siteName || 'Hostal Acuario'}" <${config.supportEmail || config.smtpUser}>`,
             to: email,
             subject: "Recuperación de Contraseña",
             text: `Tu código de recuperación es: ${resetToken}`,
             html: `
                 <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
                     <h2 style="color: #d97706;">Hola ${user.name || 'Usuario'}</h2>
-                    <p>Has solicitado restablecer tu contraseña. Usa el siguiente código para continuar:</p>
+                    <p>Has solicitado restablecer tu contraseña en <strong>${config.siteName}</strong>. Usa el siguiente código para continuar:</p>
                     <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0;">
                         <span style="font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #111;">${resetToken}</span>
                     </div>

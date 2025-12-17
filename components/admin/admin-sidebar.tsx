@@ -1,96 +1,149 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import {
-    AudioWaveform,
-    BookOpen,
-    Bot,
-    Command,
-    Frame,
-    GalleryVerticalEnd,
-    Map,
-    PieChart,
-    Settings2,
-    SquareTerminal,
+    Home,
     Users,
-    BedDouble,
     CalendarDays,
-    LayoutDashboard,
-    Home
+    BedDouble,
+    Settings,
+    LogOut,
+    ChevronLeft,
+    ChevronRight
 } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
-import { HotelHeader } from "@/components/hotel-header"
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarRail,
-} from "@/components/ui/sidebar"
-
-// Sample data
-const data = {
-    user: {
-        name: "Hotel Acuarios",
-        email: "admin@hotel.com",
-        avatar: "/avatars/shadcn.jpg",
+const navItems = [
+    {
+        title: "Dashboard",
+        href: "/admin",
+        icon: Home,
     },
-    navMain: [
-        {
-            title: "Vista General",
-            url: "/admin",
-            icon: Home,
-            isActive: true,
-            items: [
-                {
-                    title: "Dashboard",
-                    url: "/admin",
-                },
-                {
-                    title: "Clientes",
-                    url: "/admin/clientes",
-                },
-                {
-                    title: "Reservas",
-                    url: "/admin/reservas",
-                },
-                {
-                    title: "Habitaciones",
-                    url: "/admin/habitaciones",
-                },
-            ],
-        },
-        {
-            title: "Configuración",
-            url: "#",
-            icon: Settings2,
-            items: [
-                {
-                    title: "General",
-                    url: "/admin/settings",
-                },
-            ],
-        },
-    ],
-    projects: []
-}
+    {
+        title: "Reservas",
+        href: "/admin/reservas",
+        icon: CalendarDays,
+    },
+    {
+        title: "Habitaciones",
+        href: "/admin/habitaciones",
+        icon: BedDouble,
+    },
+    {
+        title: "Clientes",
+        href: "/admin/clientes",
+        icon: Users,
+    },
+]
 
-export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AdminSidebar() {
+    const pathname = usePathname()
+    const [collapsed, setCollapsed] = React.useState(false)
+
     return (
-        <Sidebar collapsible="icon" {...props}>
-            <SidebarHeader>
-                <HotelHeader />
-            </SidebarHeader>
-            <SidebarContent>
-                <NavMain items={data.navMain} />
-            </SidebarContent>
-            <SidebarFooter>
-                <NavUser user={data.user} />
-            </SidebarFooter>
-            <SidebarRail />
-        </Sidebar>
+        <aside
+            className={cn(
+                "hidden md:flex flex-col bg-white border-r border-slate-200 transition-all duration-300 shrink-0",
+                collapsed ? "w-16" : "w-64"
+            )}
+        >
+            {/* Header */}
+            <div className={cn(
+                "h-16 flex items-center border-b border-slate-100 px-4",
+                collapsed ? "justify-center" : "justify-between"
+            )}>
+                {!collapsed && (
+                    <Link href="/admin" className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center font-bold text-white text-sm">
+                            HA
+                        </div>
+                        <span className="font-semibold text-slate-900 text-sm">Hotel Acuario</span>
+                    </Link>
+                )}
+                {collapsed && (
+                    <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center font-bold text-white text-sm">
+                        HA
+                    </div>
+                )}
+            </div>
+
+            {/* Navigation */}
+            <nav className="flex-1 py-4 px-2 space-y-1">
+                {navItems.map((item) => {
+                    const isActive = pathname === item.href ||
+                        (item.href !== "/admin" && pathname.startsWith(item.href))
+
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={cn(
+                                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                                isActive
+                                    ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50",
+                                collapsed && "justify-center"
+                            )}
+                        >
+                            <item.icon className={cn(
+                                "w-5 h-5 shrink-0",
+                                isActive ? "text-amber-600" : "text-slate-400"
+                            )} />
+                            {!collapsed && <span>{item.title}</span>}
+                        </Link>
+                    )
+                })}
+            </nav>
+
+            <Separator className="bg-slate-100" />
+
+            {/* Footer */}
+            <div className="p-2 space-y-1">
+                <Link
+                    href="/admin/configuracion"
+                    className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors",
+                        collapsed && "justify-center"
+                    )}
+                >
+                    <Settings className="w-5 h-5 shrink-0 text-slate-400" />
+                    {!collapsed && <span>Configuración</span>}
+                </Link>
+                <Link
+                    href="/"
+                    className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors",
+                        collapsed && "justify-center"
+                    )}
+                >
+                    <LogOut className="w-5 h-5 shrink-0 text-slate-400" />
+                    {!collapsed && <span>Salir al sitio</span>}
+                </Link>
+
+                {/* Collapse Toggle */}
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCollapsed(!collapsed)}
+                    className={cn(
+                        "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-colors",
+                        collapsed && "justify-center"
+                    )}
+                >
+                    {collapsed ? (
+                        <ChevronRight className="w-4 h-4" />
+                    ) : (
+                        <>
+                            <ChevronLeft className="w-4 h-4" />
+                            <span>Colapsar</span>
+                        </>
+                    )}
+                </Button>
+            </div>
+        </aside>
     )
 }

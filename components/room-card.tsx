@@ -3,8 +3,10 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, Heart, Star } from "lucide-react"
+import { ChevronLeft, ChevronRight, Heart, Star, VenetianMask, Wind } from "lucide-react"
 import { toast } from "sonner"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
 interface RoomCardProps {
   id: string
@@ -12,7 +14,7 @@ interface RoomCardProps {
   description?: string
   price: number
   priceHour?: number
-  climate?: string // Nuevo campo opcional
+  climate?: string
   rating: number
   reviews: number
   images: string[]
@@ -41,14 +43,12 @@ export function RoomCard({
   initialIsFavorite = false,
   onAction
 }: RoomCardProps) {
-  // ... (mismo estado)
   const [currentImage, setCurrentImage] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite)
 
   const validImages = images && images.length > 0 ? images : ["/placeholder.jpg"]
 
-  // ... (mismos handlers: nextImage, prevImage, toggleFavorite)
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -86,7 +86,7 @@ export function RoomCard({
       })
 
       if (!res.ok) {
-        setIsFavorite(previousState) // Revertir
+        setIsFavorite(previousState)
 
         if (res.status === 401) {
           toast.error("Debes iniciar sesión", {
@@ -125,38 +125,29 @@ export function RoomCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex flex-col h-full gap-2">
-        {/* Image Container (mismo código) */}
-        <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-200">
+      <div className="flex flex-col h-full gap-3">
+        {/* Image Container */}
+        <div className="relative aspect-square overflow-hidden rounded-2xl bg-gray-100 shadow-sm transition-all group-hover:shadow-md">
 
-          {/* Climate Badge */}
-          {climate === 'AIRE' && (
-            <div className="absolute top-3 left-3 z-20">
-              <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                ❄️ Aire Acondicionado
-              </span>
-            </div>
-          )}
-          {climate === 'VENTILADOR' && (
-            <div className="absolute top-3 left-3 z-20">
-              <span className="inline-flex items-center rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700 ring-1 ring-inset ring-orange-600/20">
-                🌀 Ventilador
-              </span>
-            </div>
-          )}
+          {/* Badges Container - Stacked automatically */}
+          <div className="absolute top-3 left-3 z-20 flex flex-col gap-2 items-start">
+            {climate === 'AIRE' && (
+              <Badge variant="secondary" className="bg-blue-50/90 hover:bg-blue-100 text-blue-700 backdrop-blur-sm border-blue-200">
+                <Wind className="w-3 h-3 mr-1" /> Aire Acondicionado
+              </Badge>
+            )}
+            {climate === 'VENTILADOR' && (
+              <Badge variant="secondary" className="bg-orange-50/90 hover:bg-orange-100 text-orange-700 backdrop-blur-sm border-orange-200">
+                <VenetianMask className="w-3 h-3 mr-1" /> Ventilador
+              </Badge>
+            )}
 
-          {/* Guest Favorite Badge (Moved down if climate exists, or kept if not) */}
-          {(isGuestFavorite || rating >= 4.8) && (
-            <div className={`absolute ${climate && climate !== 'NONE' ? 'top-10' : 'top-3'} left-3 z-20`}>
-              <div className="relative shadow-sm">
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm shadow-sm">
-                  <span className="text-[12px] font-semibold text-slate-900 tracking-tight">
-                    Favorito
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
+            {(isGuestFavorite || rating >= 4.8) && (
+              <Badge variant="secondary" className="bg-white/90 hover:bg-white text-slate-900 backdrop-blur-md shadow-sm border-white/50">
+                <Heart className="w-3 h-3 mr-1 text-red-500 fill-red-500" /> Favorito
+              </Badge>
+            )}
+          </div>
 
           {/* Image carousel */}
           <div className="relative h-full w-full">
@@ -166,8 +157,10 @@ export function RoomCard({
                 src={image}
                 alt={`${title} - Foto ${index + 1}`}
                 fill
-                className={`object-cover transition-opacity duration-300 ${index === currentImage ? "opacity-100" : "opacity-0"
-                  }`}
+                className={cn(
+                  "object-cover transition-all duration-500",
+                  index === currentImage ? "opacity-100 scale-100" : "opacity-0 scale-105"
+                )}
                 priority={index === 0}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
@@ -177,36 +170,39 @@ export function RoomCard({
           {/* Favorite button */}
           <button
             onClick={toggleFavorite}
-            className="absolute right-3 top-3 z-10 p-2 transition-transform hover:scale-110 active:scale-95"
+            className="absolute right-3 top-3 z-10 p-2 rounded-full transition-all hover:scale-110 active:scale-95 hover:bg-black/10 backdrop-blur-[2px]"
             aria-label={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
           >
             <Heart
-              className={`h-6 w-6 stroke-[2px] transition-colors drop-shadow-sm ${isFavorite
-                ? "fill-rose-500 stroke-rose-500"
-                : "fill-black/50 stroke-white"
-                }`}
+              className={cn(
+                "h-6 w-6 stroke-[2px] transition-colors drop-shadow-md",
+                isFavorite
+                  ? "fill-rose-500 stroke-rose-500"
+                  : "fill-black/40 stroke-white"
+              )}
             />
           </button>
 
           {/* Navigation arrows */}
-          {isHovered && validImages.length > 1 && (
-            <>
-              <button
-                onClick={prevImage}
-                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-1.5 shadow-md transition-all hover:bg-white hover:scale-105 active:scale-95 opacity-0 group-hover:opacity-100 disabled:opacity-50"
-                aria-label="Imagen anterior"
-              >
-                <ChevronLeft className="h-4 w-4 text-slate-800" />
-              </button>
-              <button
-                onClick={nextImage}
-                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-1.5 shadow-md transition-all hover:bg-white hover:scale-105 active:scale-95 opacity-0 group-hover:opacity-100 disabled:opacity-50"
-                aria-label="Siguiente imagen"
-              >
-                <ChevronRight className="h-4 w-4 text-slate-800" />
-              </button>
-            </>
-          )}
+          <div className={cn(
+            "absolute inset-0 flex items-center justify-between px-2 pointer-events-none transition-opacity duration-200",
+            isHovered && validImages.length > 1 ? "opacity-100" : "opacity-0"
+          )}>
+            <button
+              onClick={prevImage}
+              className="pointer-events-auto rounded-full bg-white/90 p-1.5 shadow-md transition-all hover:bg-white hover:scale-110 active:scale-95"
+              aria-label="Imagen anterior"
+            >
+              <ChevronLeft className="h-4 w-4 text-slate-800" />
+            </button>
+            <button
+              onClick={nextImage}
+              className="pointer-events-auto rounded-full bg-white/90 p-1.5 shadow-md transition-all hover:bg-white hover:scale-110 active:scale-95"
+              aria-label="Siguiente imagen"
+            >
+              <ChevronRight className="h-4 w-4 text-slate-800" />
+            </button>
+          </div>
 
           {/* Dots indicator */}
           {validImages.length > 1 && (
@@ -214,10 +210,12 @@ export function RoomCard({
               {validImages.map((_, index) => (
                 <span
                   key={index}
-                  className={`h-1.5 w-1.5 rounded-full transition-all shadow-sm ${index === currentImage
-                    ? "bg-white w-2 opacity-100"
-                    : "bg-white/60 opacity-80"
-                    }`}
+                  className={cn(
+                    "h-1.5 rounded-full transition-all shadow-sm backdrop-blur-[2px]",
+                    index === currentImage
+                      ? "bg-white w-3 opacity-100"
+                      : "bg-white/60 w-1.5 opacity-80 hover:bg-white/80"
+                  )}
                 />
               ))}
             </div>
@@ -225,12 +223,14 @@ export function RoomCard({
         </div>
 
         {/* Card content */}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1.5 px-1">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-base text-slate-900 line-clamp-1">{title}</h3>
-            <div className="flex items-center gap-1 shrink-0">
+            <h3 className="font-semibold text-[17px] text-slate-900 line-clamp-1 group-hover:text-amber-700 transition-colors">
+              {title}
+            </h3>
+            <div className="flex items-center gap-1 shrink-0 mt-0.5">
               <Star className="w-3.5 h-3.5 fill-slate-900 text-slate-900" />
-              <span className="text-sm font-light">{rating.toFixed(2)}</span>
+              <span className="text-sm font-medium text-slate-900">{rating.toFixed(2)}</span>
             </div>
           </div>
 
@@ -238,24 +238,24 @@ export function RoomCard({
             {holder && <p className="line-clamp-1">Anfitrión: {holder}</p>}
 
             {amenities && amenities.length > 0 ? (
-              <p className="line-clamp-1">{amenities.slice(0, 3).join(" · ")}</p>
+              <p className="line-clamp-1 text-slate-400">{amenities.slice(0, 3).join(" · ")}</p>
             ) : description ? (
-              <p className="line-clamp-1">{description}</p>
+              <p className="line-clamp-1 text-slate-400">{description}</p>
             ) : null}
 
-            <div className="mt-1.5 flex flex-wrap gap-x-3 items-baseline">
+            <div className="mt-2 flex flex-wrap gap-x-3 items-baseline">
               {/* Precio Hospedaje */}
-              <p className="text-slate-900">
-                <span className="font-semibold">${price.toLocaleString('es-CO')}</span>
-                <span className="font-light"> noche</span>
+              <p className="text-slate-900 flex items-baseline gap-1">
+                <span className="font-bold text-lg">${price.toLocaleString('es-CO')}</span>
+                <span className="font-light text-slate-600">noche</span>
               </p>
 
               {/* Precio Por Rato (si existe) */}
               {priceHour && priceHour > 0 && (
-                <p className="text-slate-600">
-                  <span className="font-medium">${priceHour.toLocaleString('es-CO')}</span>
-                  <span className="font-light text-sm"> / 3h</span>
-                </p>
+                <div className="flex items-center gap-1 text-sm text-slate-500 before:content-['•'] before:mr-1">
+                  <span className="font-semibold">${priceHour.toLocaleString('es-CO')}</span>
+                  <span className="font-light">/ 3h</span>
+                </div>
               )}
             </div>
           </div>
