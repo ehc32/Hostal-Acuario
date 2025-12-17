@@ -74,15 +74,27 @@ export async function DELETE(req: Request) {
 
         const { searchParams } = new URL(req.url)
         const id = searchParams.get('id')
+        const permanent = searchParams.get('permanent') === 'true'
 
         if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 })
 
-        const deletedUser = await prisma.user.update({
-            where: { id: Number(id) },
-            data: { status: 'DELETED' }
-        })
-
-        return NextResponse.json(deletedUser)
+        if (permanent) {
+            // Eliminación permanente (hard delete)
+            const deletedUser = await prisma.user.delete({
+                where: { id: Number(id) }
+            })
+            return NextResponse.json({
+                message: "User permanently deleted",
+                user: deletedUser
+            })
+        } else {
+            // Soft delete (solo cambiar estado)
+            const deletedUser = await prisma.user.update({
+                where: { id: Number(id) },
+                data: { status: 'DELETED' }
+            })
+            return NextResponse.json(deletedUser)
+        }
     } catch (error) {
         console.error("Error deleting user:", error)
         return NextResponse.json({ error: "Error deleting user" }, { status: 500 })

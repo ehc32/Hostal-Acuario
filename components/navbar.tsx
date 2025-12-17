@@ -21,7 +21,31 @@ import { cn } from "@/lib/utils"
 export function Navbar() {
     const { user, logout } = useAuth()
     const [scrolled, setScrolled] = useState(false)
+    const [logoUrl, setLogoUrl] = useState("/logo.png")
+    const [siteName, setSiteName] = useState("Hostal Acuario")
     const pathname = usePathname()
+
+    // Fetch logo and site name from configuration
+    useEffect(() => {
+        const fetchConfig = async () => {
+            try {
+                const res = await fetch("/api/config")
+                if (res.ok) {
+                    const data = await res.json()
+                    // Solo actualizar si hay un logoUrl válido
+                    if (data.logoUrl && data.logoUrl.trim() !== "") {
+                        setLogoUrl(data.logoUrl)
+                    }
+                    if (data.siteName) {
+                        setSiteName(data.siteName)
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching config:", error)
+            }
+        }
+        fetchConfig()
+    }, [])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -56,16 +80,16 @@ export function Navbar() {
                 <div className="flex items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2 group transition-opacity hover:opacity-90">
-                        <div className="relative w-10 h-10 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
+                        <div className="relative w-10 h-10 overflow-hidden  group-hover:shadow-md transition-shadow">
                             <Image
-                                src="/logo.png"
+                                src={logoUrl}
                                 alt="Hotel Acuario Logo"
                                 fill
-                                className="object-cover"
+                                className="object-contain p-1"
                             />
                         </div>
                         <span className="font-bold text-lg text-gray-900 tracking-tight hidden sm:block">
-                            Hostal Acuario
+                            {siteName}
                         </span>
                     </Link>
 
@@ -175,13 +199,13 @@ export function Navbar() {
                                 <SheetHeader className="p-6 border-b border-gray-100 bg-gray-50/50">
                                     <SheetTitle className="flex items-center gap-2">
                                         <Image
-                                            src="/logo.png"
+                                            src={logoUrl}
                                             alt="Hotel Acuario"
                                             width={32}
                                             height={32}
                                             className="object-contain"
                                         />
-                                        <span className="font-bold text-gray-900">Hotel Acuario</span>
+                                        <span className="font-bold text-gray-900">{siteName}</span>
                                     </SheetTitle>
                                     <SheetDescription>
                                         Bienvenido a tu mejor experiencia.
@@ -268,7 +292,7 @@ export function Navbar() {
 
                                     <div className="mt-auto px-6 py-6 border-t border-gray-100">
                                         <p className="text-xs text-center text-gray-400">
-                                            © {new Date().getFullYear()} Hotel Acuario.
+                                            © {new Date().getFullYear()} {siteName}.
                                             <br />
                                             Todos los derechos reservados.
                                         </p>

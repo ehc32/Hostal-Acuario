@@ -2,10 +2,15 @@ import { Mail, Phone, MapPin } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 
 export const Footer = async () => {
-  // Obtener configuración global
-  const config = await prisma.configuration.findUnique({
-    where: { id: 1 }
-  });
+  // Obtener configuración global (con fallback si falla)
+  let config = null;
+  try {
+    config = await prisma.configuration.findUnique({
+      where: { id: 1 }
+    });
+  } catch (error) {
+    console.error("Error fetching config:", error);
+  }
 
   const year = new Date().getFullYear();
   const address = config?.address || "Calle 13 #16-53 Mártires, Colombia";

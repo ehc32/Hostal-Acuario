@@ -42,6 +42,7 @@ interface ClientCellActionProps {
 
 export function ClientCellAction({ client }: ClientCellActionProps) {
     const [openAlert, setOpenAlert] = useState(false)
+    const [openDeleteAlert, setOpenDeleteAlert] = useState(false)
     const [openDetail, setOpenDetail] = useState(false)
     const [loading, setLoading] = useState(false)
     const router = useRouter()
@@ -96,6 +97,35 @@ export function ClientCellAction({ client }: ClientCellActionProps) {
         } finally {
             setLoading(false)
             setOpenAlert(false)
+        }
+    }
+
+    const onPermanentDelete = async () => {
+        try {
+            setLoading(true)
+
+            const token = localStorage.getItem("token")
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+            if (token) headers['Authorization'] = `Bearer ${token}`
+
+            const res = await fetch(`/api/admin/users?id=${client.id}&permanent=true`, {
+                method: 'DELETE',
+                headers
+            })
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}))
+                throw new Error(errData.error || "Error al eliminar cliente")
+            }
+
+            toast.success("Cliente eliminado permanentemente")
+            router.refresh()
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "No se pudo eliminar el cliente")
+            console.error(error)
+        } finally {
+            setLoading(false)
+            setOpenDeleteAlert(false)
         }
     }
 
@@ -200,6 +230,39 @@ export function ClientCellAction({ client }: ClientCellActionProps) {
                 </AlertDialogContent>
             </AlertDialog>
 
+            {/* Alerta de Eliminación Permanente */}
+            <AlertDialog open={openDeleteAlert} onOpenChange={setOpenDeleteAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-red-600">
+                            ¿Eliminar permanentemente?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-2">
+                            <p className="font-semibold">Esta acción NO se puede deshacer.</p>
+                            <p>Se eliminarán permanentemente:</p>
+                            <ul className="list-disc list-inside text-sm space-y-1 ml-2">
+                                <li>Datos del cliente</li>
+                                <li>Historial de reservas</li>
+                                <li>Favoritos y reseñas</li>
+                            </ul>
+                            <p className="text-red-600 font-medium mt-2">
+                                Cliente: <span className="font-bold">{client.name || client.email}</span>
+                            </p>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={loading}>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                            disabled={loading}
+                            onClick={onPermanentDelete}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            {loading ? "Eliminando..." : "Eliminar Permanentemente"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             {/* Menú de Acciones */}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -231,6 +294,16 @@ export function ClientCellAction({ client }: ClientCellActionProps) {
                                 Desactivar
                             </>
                         )}
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem
+                        onClick={() => setOpenDeleteAlert(true)}
+                        className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
+                    >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Eliminar Permanentemente
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

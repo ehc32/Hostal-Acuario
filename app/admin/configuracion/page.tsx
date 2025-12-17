@@ -8,7 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
-import { Loader2, Save } from "lucide-react"
+import { Loader2, Save, Upload, X } from "lucide-react"
+import Image from "next/image"
 
 export default function ConfiguracionPage() {
     const [loading, setLoading] = useState(false)
@@ -16,6 +17,7 @@ export default function ConfiguracionPage() {
     const [formData, setFormData] = useState({
         siteName: "",
         supportEmail: "",
+        logoUrl: "",
         address: "",
         phone: "",
         cloudinaryCloudName: "",
@@ -27,6 +29,10 @@ export default function ConfiguracionPage() {
         smtpPass: ""
     })
 
+    // State for Logo Upload
+    const [logoFile, setLogoFile] = useState<File | null>(null)
+    const [logoPreview, setLogoPreview] = useState<string | null>(null)
+
     useEffect(() => {
         const fetchConfig = async () => {
             try {
@@ -35,22 +41,32 @@ export default function ConfiguracionPage() {
                 if (token) headers["Authorization"] = `Bearer ${token}`
 
                 const res = await fetch("/api/admin/config", { headers })
-                if (res.ok) {
-                    const data = await res.json()
-                    setFormData({
-                        siteName: data.siteName || "",
-                        supportEmail: data.supportEmail || "",
-                        address: data.address || "",
-                        phone: data.phone || "",
-                        cloudinaryCloudName: data.cloudinaryCloudName || "",
-                        cloudinaryApiKey: data.cloudinaryApiKey || "",
-                        cloudinaryApiSecret: data.cloudinaryApiSecret || "",
-                        smtpHost: data.smtpHost || "smtp.gmail.com",
-                        smtpPort: data.smtpPort || "587",
-                        smtpUser: data.smtpUser || "",
-                        smtpPass: data.smtpPass || ""
-                    })
+
+                if (!res.ok) {
+                    console.error("Error response from config API:", res.status, res.statusText)
+                    const errorText = await res.text()
+                    console.error("Error details:", errorText)
+                    toast.error("No se pudo cargar la configuración. Usando valores por defecto.")
+                    return
                 }
+
+                const data = await res.json()
+                console.log("Config loaded:", data)
+
+                setFormData({
+                    siteName: data.siteName || "",
+                    supportEmail: data.supportEmail || "",
+                    logoUrl: data.logoUrl || "",
+                    address: data.address || "",
+                    phone: data.phone || "",
+                    cloudinaryCloudName: data.cloudinaryCloudName || "",
+                    cloudinaryApiKey: data.cloudinaryApiKey || "",
+                    cloudinaryApiSecret: data.cloudinaryApiSecret || "",
+                    smtpHost: data.smtpHost || "smtp.gmail.com",
+                    smtpPort: data.smtpPort || "587",
+                    smtpUser: data.smtpUser || "",
+                    smtpPass: data.smtpPass || ""
+                })
             } catch (error) {
                 console.error("Error cargando configuración", error)
                 toast.error("Error al cargar la configuración")
@@ -66,6 +82,20 @@ export default function ConfiguracionPage() {
         setFormData(prev => ({ ...prev, [name]: value }))
     }
 
+    const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0]
+            setLogoFile(file)
+            setLogoPreview(URL.createObjectURL(file))
+        }
+    }
+
+    const removeLogo = () => {
+        setLogoFile(null)
+        setLogoPreview(null)
+        setFormData(prev => ({ ...prev, logoUrl: "" }))
+    }
+
     const handleSave = async () => {
         setLoading(true)
         try {
@@ -73,10 +103,24 @@ export default function ConfiguracionPage() {
             const headers: HeadersInit = { "Content-Type": "application/json" }
             if (token) headers["Authorization"] = `Bearer ${token}`
 
+
+            let finalLogoUrl = formData.logoUrl
+
+            // Upload logo if selected
+            if (logoFile) {
+                const resLogo = await fetch(`/api/upload?filename=${encodeURIComponent(logoFile.name)}`, {
+                    method: 'POST',
+                    body: logoFile,
+                })
+                if (!resLogo.ok) throw new Error("Error al subir el logo")
+                const blob = await resLogo.json()
+                finalLogoUrl = blob.url
+            }
+
             const res = await fetch("/api/admin/config", {
                 method: "PUT",
                 headers,
-                body: JSON.stringify(formData)
+                body: JSON.stringify({ ...formData, logoUrl: finalLogoUrl })
             })
 
             if (!res.ok) {
@@ -136,6 +180,46 @@ export default function ConfiguracionPage() {
                             <div className="space-y-1">
                                 <Label>Email de Soporte</Label>
                                 <Input name="supportEmail" value={formData.supportEmail} onChange={handleChange} placeholder="soporte@ejemplo.com" />
+                            </div>
+
+                            <div className="space-y-1">
+                                <Label>Logo del Sitio</Label>
+                                <div className="flex items-center gap-4">
+                                    {(logoPreview || formData.logoUrl) ? (
+                                        <div className="relative w-32 h-32 border rounded-md overflow-hidden bg-slate-50">
+                                            <Image
+                                                src={logoPreview || formData.logoUrl}
+                                                alt="Logo"
+                                                fill
+                                                className="object-contain p-2"
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="destructive"
+                                                size="icon"
+                                                className="absolute top-1 right-1 h-6 w-6"
+                                                onClick={removeLogo}
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <div className="w-32 h-32 border border-dashed rounded-md flex items-center justify-center bg-slate-50 text-slate-400">
+                                            <span className="text-xs">Sin Logo</span>
+                                        </div>
+                                    )}
+                                    <div className="space-y-2">
+                                        <Input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleLogoSelect}
+                                            className="w-full max-w-xs"
+                                        />
+                                        <p className="text-xs text-muted-foreground">
+                                            Recomendado: 200x200px, PNG transparente.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>

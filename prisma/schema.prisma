@@ -119,6 +119,9 @@ model Configuration {
   siteName     String  @default("Hostal Acuario")
   siteDescription String?
   supportEmail String?
+  
+  // Assets
+  logoUrl String?
 
   // Hotel Info
   address String?

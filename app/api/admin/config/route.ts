@@ -11,13 +11,25 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        // Obtener configuración
-        let config = await prisma.configuration.findUnique({
-            where: { id: 1 }
-        });
+        // Obtener configuración (con manejo de error si logoUrl no existe)
+        let config;
+        try {
+            config = await prisma.configuration.findUnique({
+                where: { id: 1 }
+            });
+        } catch (dbError) {
+            console.error("Database error fetching config:", dbError);
+            // Si falla (probablemente por columna logoUrl faltante), crear config básica
+            config = await prisma.configuration.create({
+                data: {
+                    id: 1,
+                    siteName: "Hostal Acuario",
+                }
+            });
+        }
 
         if (!config) {
-            // Crear por defecto
+            // Crear por defecto si no existe
             config = await prisma.configuration.create({
                 data: {
                     id: 1,
@@ -49,6 +61,7 @@ export async function PUT(req: Request) {
             supportEmail,
             address,
             phone,
+            logoUrl,
             cloudinaryCloudName,
             cloudinaryApiKey,
             cloudinaryApiSecret,
@@ -64,6 +77,7 @@ export async function PUT(req: Request) {
             supportEmail,
             address,
             phone,
+            logoUrl,
             cloudinaryCloudName,
             cloudinaryApiKey,
             cloudinaryApiSecret,
