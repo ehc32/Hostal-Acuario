@@ -4,7 +4,9 @@ import { useState } from "react"
 import { RoomCard } from "./room-card"
 import { Button } from "@/components/ui/button"
 import { ChevronDown } from "lucide-react"
-import { ClimateType } from "@prisma/client"
+// import { ClimateType } from "@prisma/client"
+
+type ClimateType = "AIRE" | "VENTILADOR" | "NONE"
 
 interface RoomWithDetails {
     id: number
@@ -13,7 +15,7 @@ interface RoomWithDetails {
     description: string
     price: number
     priceHour: number
-    climate: ClimateType
+    climate: ClimateType | string // Permitir string para máxima compatibilidad
     rating: number
     reviews: number
     images: string[]

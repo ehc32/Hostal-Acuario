@@ -8,13 +8,8 @@ async function getRooms() {
       orderBy: { createdAt: 'desc' } // O 'asc' si prefieren orden específico
     })
 
-    // Serializar fechas para pasar al Client Component
-    return rooms.map(room => ({
-      ...room,
-      priceHour: room.priceHour ?? 0,
-      createdAt: room.createdAt.toISOString(),
-      updatedAt: room.updatedAt.toISOString(),
-    }))
+    // Serializar completamente para evitar errores de Client Component
+    return JSON.parse(JSON.stringify(rooms))
   } catch (error) {
     console.error("Error fetching rooms:", error)
     return []
