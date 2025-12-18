@@ -16,6 +16,7 @@ export default function ConfiguracionPage() {
     const [fetching, setFetching] = useState(true)
     const [formData, setFormData] = useState({
         siteName: "",
+        siteDescription: "",
         supportEmail: "",
         logoUrl: "",
         address: "",
@@ -65,7 +66,8 @@ export default function ConfiguracionPage() {
                     smtpHost: data.smtpHost || "smtp.gmail.com",
                     smtpPort: data.smtpPort || "587",
                     smtpUser: data.smtpUser || "",
-                    smtpPass: data.smtpPass || ""
+                    smtpPass: data.smtpPass || "",
+                    siteDescription: data.siteDescription || ""
                 })
             } catch (error) {
                 console.error("Error cargando configuración", error)
@@ -180,6 +182,10 @@ export default function ConfiguracionPage() {
                             <div className="space-y-1">
                                 <Label>Email de Soporte</Label>
                                 <Input name="supportEmail" value={formData.supportEmail} onChange={handleChange} placeholder="soporte@ejemplo.com" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label>Descripción del Sitio</Label>
+                                <Input name="siteDescription" value={formData.siteDescription} onChange={handleChange} placeholder="Descripción del sitio" />
                             </div>
 
                             <div className="space-y-1">

@@ -13,11 +13,12 @@ export const Footer = async () => {
   }
 
   const year = new Date().getFullYear();
-  const address = config?.address || "Calle 13 #16-53 Mártires, Colombia";
-  const phone = config?.phone || "+57 318 354 6487";
+  const address = config?.address ?? "";
+  const phone = config?.phone ?? "";
   const cleanPhone = phone.replace(/\D/g, '');
-  const email = config?.supportEmail || "elellanos@hotmail.com";
-  const siteName = config?.siteName || "Hostal Acuario";
+  const email = config?.supportEmail ?? "";
+  const siteName = config?.siteName ?? "";
+  const siteDescription = config?.siteDescription ?? "";
 
   return (
     <footer id="contacto" className="w-full bg-slate-50 border-t border-gray-200 pt-10 pb-6">
@@ -31,7 +32,7 @@ export const Footer = async () => {
             <div>
               <h3 className="text-xl font-bold text-gray-900">{siteName}</h3>
               <p className="text-sm text-gray-500 max-w-md mt-1 leading-relaxed">
-                {config?.siteDescription || "Descanso y confort en el corazón."}
+                {siteDescription}
               </p>
             </div>
 
