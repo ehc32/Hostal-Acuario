@@ -31,7 +31,7 @@ export const Footer = async () => {
             <div>
               <h3 className="text-xl font-bold text-gray-900">{siteName}</h3>
               <p className="text-sm text-gray-500 max-w-md mt-1 leading-relaxed">
-                {config?.siteDescription || "Descanso y confort en el corazón de Melgar."}
+                {config?.siteDescription || "Descanso y confort en el corazón."}
               </p>
             </div>
 
