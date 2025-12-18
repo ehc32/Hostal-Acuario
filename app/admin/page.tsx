@@ -1,9 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { prisma } from "@/lib/prisma"
-import { BedDouble, CalendarDays, Users, DollarSign, ArrowUpRight, Clock, CheckCircle2 } from "lucide-react"
+import { BedDouble, CalendarDays, Users, DollarSign, ArrowUpRight, Clock, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { DashboardDataTable } from "@/components/admin/dashboard-data-table"
+import { columns } from "@/components/admin/dashboard-columns"
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default async function AdminDashboard() {
     const roomsCount = await prisma.room.count()
@@ -106,44 +111,35 @@ export default async function AdminDashboard() {
             </div>
 
             {/* Quick Links */}
+            {/* Quick Links */}
             <div className="grid gap-4 md:grid-cols-3">
-                <Link href="/admin/reservas" className="group">
-                    <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div>
-                                <CardTitle className="text-base">Gestionar Reservas</CardTitle>
-                                <CardDescription>Ver, confirmar o cancelar</CardDescription>
-                            </div>
-                            <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                        </CardHeader>
-                    </Card>
+                <Link href="/admin/reservas" className="bg-white p-4 rounded-lg border hover:bg-slate-50 transition-all group block shadow-sm hover:shadow-md">
+                    <div className="flex items-center justify-between mb-1">
+                        <span className="font-semibold text-slate-900 text-base">Reservas</span>
+                        <ArrowRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                    <p className="text-sm text-slate-500">Gestionar todas las solicitudes.</p>
                 </Link>
-                <Link href="/admin/habitaciones" className="group">
-                    <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div>
-                                <CardTitle className="text-base">Habitaciones</CardTitle>
-                                <CardDescription>Editar precios y fotos</CardDescription>
-                            </div>
-                            <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                        </CardHeader>
-                    </Card>
+
+                <Link href="/admin/habitaciones" className="bg-white p-4 rounded-lg border hover:bg-slate-50 transition-all group block shadow-sm hover:shadow-md">
+                    <div className="flex items-center justify-between mb-1">
+                        <span className="font-semibold text-slate-900 text-base">Habitaciones</span>
+                        <ArrowRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                    <p className="text-sm text-slate-500">Editar inventario y precios.</p>
                 </Link>
-                <Link href="/admin/clientes" className="group">
-                    <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div>
-                                <CardTitle className="text-base">Clientes</CardTitle>
-                                <CardDescription>Ver información de usuarios</CardDescription>
-                            </div>
-                            <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                        </CardHeader>
-                    </Card>
+
+                <Link href="/admin/clientes" className="bg-white p-4 rounded-lg border hover:bg-slate-50 transition-all group block shadow-sm hover:shadow-md">
+                    <div className="flex items-center justify-between mb-1">
+                        <span className="font-semibold text-slate-900 text-base">Clientes</span>
+                        <ArrowRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                    <p className="text-sm text-slate-500">Base de datos de usuarios.</p>
                 </Link>
             </div>
 
             {/* Recent Reservations */}
-            <Card>
+            <Card className="border-slate-100 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between">
                     <div>
                         <CardTitle>Reservas Recientes</CardTitle>
@@ -154,43 +150,8 @@ export default async function AdminDashboard() {
                     </Link>
                 </CardHeader>
                 <CardContent>
-                    <div className="space-y-4">
-                        {recentReservations.length === 0 ? (
-                            <p className="text-sm text-muted-foreground text-center py-8">No hay reservas recientes</p>
-                        ) : (
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            recentReservations.map((res: any) => (
-                                <div key={res.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                                            <Users className="w-4 h-4 text-slate-600" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-sm">{res.user?.name || res.user?.email || 'Anónimo'}</p>
-                                            <p className="text-xs text-muted-foreground">{res.room?.title || 'Habitación'}</p>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <Badge
-                                            variant="outline"
-                                            className={
-                                                res.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                                                    res.status === 'CONFIRMED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                                                        'bg-slate-50 text-slate-600 border-slate-200'
-                                            }
-                                        >
-                                            {res.status === 'PENDING' ? 'Pendiente' :
-                                                res.status === 'CONFIRMED' ? 'Confirmada' :
-                                                    res.status === 'CANCELLED' ? 'Cancelada' : 'Completada'}
-                                        </Badge>
-                                        <p className="text-xs text-muted-foreground mt-1">
-                                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(res.total || 0)}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
+                    {/* @ts-ignore */}
+                    <DashboardDataTable columns={columns} data={recentReservations} />
                 </CardContent>
             </Card>
         </div>
