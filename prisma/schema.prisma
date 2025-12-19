@@ -115,28 +115,29 @@ model Review {
 model Configuration {
   id Int @id @default(1)
 
-  // General
-  siteName     String  @default("Hostal Acuario")
+  siteName        String  @default("Hostal Acuario")
   siteDescription String?
-  supportEmail String?
-  
-  // Assets
-  logoUrl String?
+  supportEmail    String?
 
-  // Hotel Info
+  logoUrl      String?
+  heroImage    String?  @map("hero_image")
+  infoImage    String?  @map("info_image")
+  galleryImages String[] @default([]) @map("gallery_images")
+
   address String?
   phone   String?
 
-  // Cloudinary
   cloudinaryCloudName String?
   cloudinaryApiKey    String?
   cloudinaryApiSecret String?
 
-  // SMTP
   smtpHost String?
   smtpPort String?
   smtpUser String?
   smtpPass String?
 
   updatedAt DateTime @updatedAt
+
+  @@map("Configuration")
 }
+

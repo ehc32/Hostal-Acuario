@@ -3,35 +3,24 @@
 import { useRef, useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-const images = [
-  { src: "/carusel/IMG-20251202-WA0009.jpg", alt: "Hotel Acuario - Imagen 1" },
-  { src: "/carusel/IMG-20251202-WA0010.jpg", alt: "Hotel Acuario - Imagen 2" },
-  { src: "/carusel/IMG-20251202-WA0011.jpg", alt: "Hotel Acuario - Imagen 3" },
-  { src: "/carusel/IMG-20251202-WA0012.jpg", alt: "Hotel Acuario - Imagen 4" },
-  { src: "/carusel/IMG-20251202-WA0013.jpg", alt: "Hotel Acuario - Imagen 5" },
-  { src: "/carusel/IMG-20251202-WA0014.jpg", alt: "Hotel Acuario - Imagen 6" },
-  { src: "/carusel/IMG-20251202-WA0015.jpg", alt: "Hotel Acuario - Imagen 7" },
-  { src: "/carusel/IMG-20251202-WA0016.jpg", alt: "Hotel Acuario - Imagen 8" },
-  { src: "/carusel/IMG-20251202-WA0017.jpg", alt: "Hotel Acuario - Imagen 9" },
-  { src: "/carusel/IMG-20251202-WA0018.jpg", alt: "Hotel Acuario - Imagen 10" },
-  { src: "/carusel/IMG-20251202-WA0019.jpg", alt: "Hotel Acuario - Imagen 11" },
-  { src: "/carusel/IMG-20251202-WA0020.jpg", alt: "Hotel Acuario - Imagen 12" },
-  { src: "/carusel/IMG-20251202-WA0021.jpg", alt: "Hotel Acuario - Imagen 13" },
-  { src: "/carusel/IMG-20251202-WA0022.jpg", alt: "Hotel Acuario - Imagen 14" },
-  { src: "/carusel/IMG-20251202-WA0023.jpg", alt: "Hotel Acuario - Imagen 15" },
-  { src: "/carusel/IMG-20251202-WA0024.jpg", alt: "Hotel Acuario - Imagen 16" },
-  { src: "/carusel/IMG-20251202-WA0025.jpg", alt: "Hotel Acuario - Imagen 17" },
-  { src: "/carusel/IMG-20251202-WA0026.jpg", alt: "Hotel Acuario - Imagen 18" },
-  { src: "/carusel/IMG-20251202-WA0027.jpg", alt: "Hotel Acuario - Imagen 19" },
-  { src: "/carusel/IMG-20251202-WA0028.jpg", alt: "Hotel Acuario - Imagen 20" },
-  { src: "/carusel/IMG-20251202-WA0029.jpg", alt: "Hotel Acuario - Imagen 21" },
-]
+// ... imports
 
-export function ImageCarousel() {
+interface ImageCarouselProps {
+  images?: string[]
+}
+
+export function ImageCarousel({ images: propImages }: ImageCarouselProps) {
   const trackRef = useRef<HTMLUListElement>(null)
   const [isPaused, setIsPaused] = useState(false)
 
+  const imagesToUse = propImages && propImages.length > 0
+    ? propImages.map((src, i) => ({ src, alt: `Hotel Acuario - Imagen ${i + 1}` }))
+    : []
+
   useEffect(() => {
+    // Si no hay imágenes, no iniciamos animación
+    if (imagesToUse.length === 0) return
+
     const track = trackRef.current
     if (!track) return
 
@@ -56,9 +45,9 @@ export function ImageCarousel() {
     animationId = requestAnimationFrame(animate)
 
     return () => cancelAnimationFrame(animationId)
-  }, [isPaused])
+  }, [isPaused, imagesToUse])
 
-  const tripleImages = [...images, ...images, ...images]
+  const tripleImages = [...imagesToUse, ...imagesToUse, ...imagesToUse]
 
   return (
     <section className="py-16 bg-gradient-to-b from-white to-gray-50">
@@ -77,50 +66,57 @@ export function ImageCarousel() {
         </div>
 
         {/* CARRUSEL INFINITO */}
-        <div
-          className="relative overflow-hidden py-8"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
-          {/* Gradientes laterales */}
-          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none" />
-
-          {/* Track de imágenes */}
-          <ul
-            ref={trackRef}
-            className="flex gap-6 will-change-transform"
-            style={{ width: 'fit-content' }}
+        {/* CARRUSEL INFINITO */}
+        {imagesToUse.length > 0 ? (
+          <div
+            className="relative overflow-hidden py-8"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
           >
-            {tripleImages.map((image, index) => (
-              <li
-                key={`${image.src}-${index}`}
-                className="flex-shrink-0 group"
-              >
-                <a
-                  href={image.src}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block relative overflow-hidden rounded-2xl shadow-lg
+            {/* Gradientes laterales */}
+            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none" />
+
+            {/* Track de imágenes */}
+            <ul
+              ref={trackRef}
+              className="flex gap-6 will-change-transform"
+              style={{ width: 'fit-content' }}
+            >
+              {tripleImages.map((image, index) => (
+                <li
+                  key={`${image.src}-${index}`}
+                  className="flex-shrink-0 group"
+                >
+                  <a
+                    href={image.src}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block relative overflow-hidden rounded-2xl shadow-lg
                            w-[420px] h-[280px] transition-all duration-500
                            hover:shadow-2xl hover:scale-105"
-                >
-                  <img
-                    src={image.src}
-                    alt={image.alt}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover transition-transform duration-700
+                  >
+                    <img
+                      src={image.src}
+                      alt={image.alt}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover transition-transform duration-700
                              group-hover:scale-110"
-                  />
-                  {/* Overlay sutil al hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent
+                    />
+                    {/* Overlay sutil al hover */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent
                                 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-64 w-full bg-slate-100 border-2 border-dashed border-slate-200 rounded-xl my-8">
+            <p className="text-slate-400 font-medium">Sin imágenes configuradas en la galería</p>
+          </div>
+        )}
 
         {/* Indicador de pausa */}
         <p className="text-center text-sm text-gray-400 mt-6">

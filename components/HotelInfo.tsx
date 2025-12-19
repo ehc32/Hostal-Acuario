@@ -3,7 +3,16 @@
 import { Coffee, MapPinCheck, Tv, Wifi } from "lucide-react"
 import Image from "next/image"
 
-export function InfoHotelAcuario() {
+// ... imports
+interface InfoProps {
+  imageUrl?: string
+}
+
+export function InfoHotelAcuario({ imageUrl }: InfoProps) {
+  const rawImage = imageUrl || ""
+  const isValidImage = rawImage.startsWith('/') || rawImage.startsWith('http')
+  const img = isValidImage ? rawImage : null
+
   return (
     <section
       id="informacion"
@@ -87,14 +96,20 @@ export function InfoHotelAcuario() {
               shadow-[0_8px_30px_rgba(0,0,0,0.12)]
             "
           >
-            <Image
-              src="/7473d3f5-75c4-4c06-820e-09bf48064211.png"
-              alt="Hostal Acuarios"
-              fill
-              className="object-cover object-center"
-              priority
-              sizes="100vw"
-            />
+            {img ? (
+              <Image
+                src={img}
+                alt="Hostal Acuarios"
+                fill
+                className="object-cover object-center"
+                priority
+                sizes="100vw"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400">
+                <span className="text-sm">Sin imagen configurada</span>
+              </div>
+            )}
           </div>
         </div>
 
